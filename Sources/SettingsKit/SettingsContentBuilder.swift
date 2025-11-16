@@ -25,8 +25,15 @@ public struct SettingsContentBuilder {
         component
     }
 
+    @preconcurrency
     public static func buildExpression(_ expression: SettingsContent) -> SettingsContent {
         expression
+    }
+
+    // Allow arbitrary Views to be included (they just won't contribute to the node tree)
+    @preconcurrency
+    public static func buildExpression<V: View>(_ view: V) -> SettingsContent {
+        ViewWrapper(view)
     }
 }
 
@@ -34,6 +41,23 @@ public struct SettingsContentBuilder {
 struct EmptySettingsContent: SettingsContent {
     var body: some View {
         EmptyView()
+    }
+
+    func makeNodes() -> [SettingsNode] {
+        []
+    }
+}
+
+/// Wraps an arbitrary View as SettingsContent (doesn't contribute to search/navigation)
+struct ViewWrapper: SettingsContent {
+    nonisolated(unsafe) let content: AnyView
+
+    nonisolated init<Content: View>(_ content: Content) {
+        self.content = AnyView(content)
+    }
+
+    var body: some View {
+        content
     }
 
     func makeNodes() -> [SettingsNode] {
