@@ -21,7 +21,6 @@ import SwiftUI
 ///     }
 /// }
 /// ```
-@MainActor
 public protocol SettingsItemStyle {
     associatedtype Body: View
 
@@ -57,6 +56,8 @@ public struct SettingsItemStyleConfiguration {
 // MARK: - Built-in Styles
 
 /// The default settings item style that displays content inline.
+
+
 public struct DefaultSettingsItemStyle: SettingsItemStyle {
     public init() {}
 
@@ -66,6 +67,8 @@ public struct DefaultSettingsItemStyle: SettingsItemStyle {
 }
 
 /// A settings item style that displays the title and content in a row.
+
+
 public struct RowSettingsItemStyle: SettingsItemStyle {
     public init() {}
 
@@ -79,6 +82,8 @@ public struct RowSettingsItemStyle: SettingsItemStyle {
 }
 
 /// A settings item style that displays the title above the content.
+
+
 public struct VerticalSettingsItemStyle: SettingsItemStyle {
     public init() {}
 
@@ -92,6 +97,8 @@ public struct VerticalSettingsItemStyle: SettingsItemStyle {
 }
 
 /// A settings item style with prominent styling.
+
+
 public struct ProminentSettingsItemStyle: SettingsItemStyle {
     public init() {}
 
@@ -137,6 +144,8 @@ extension EnvironmentValues {
 // MARK: - Type Erasure
 
 /// A type-erased settings item style.
+
+
 public struct AnySettingsItemStyle: SettingsItemStyle {
     private let _makeBody: (SettingsItemStyleConfiguration) -> AnyView
 
@@ -146,7 +155,6 @@ public struct AnySettingsItemStyle: SettingsItemStyle {
         }
     }
 
-    @MainActor
     public func makeBody(configuration: SettingsItemStyleConfiguration) -> some View {
         _makeBody(configuration)
     }

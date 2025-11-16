@@ -46,6 +46,7 @@ public struct SettingsGroupStyleConfiguration {
     public let content: AnyView
 
     /// A view that represents the group's label (title + icon).
+    @ViewBuilder
     public var label: some View {
         if let icon = icon {
             Label(title, systemImage: icon)
@@ -63,7 +64,6 @@ public struct SettingsGroupStyleConfiguration {
 public struct NavigationSettingsGroupStyle: SettingsGroupStyle {
     public init() {}
 
-    @MainActor
     public func makeBody(configuration: Configuration) -> some View {
         NavigationLink {
             List {
@@ -82,7 +82,6 @@ public struct NavigationSettingsGroupStyle: SettingsGroupStyle {
 public struct InlineSettingsGroupStyle: SettingsGroupStyle {
     public init() {}
 
-    @MainActor
     public func makeBody(configuration: Configuration) -> some View {
         Section {
             configuration.content
@@ -100,7 +99,6 @@ public struct InlineSettingsGroupStyle: SettingsGroupStyle {
 public struct CardSettingsGroupStyle: SettingsGroupStyle {
     public init() {}
 
-    @MainActor
     public func makeBody(configuration: Configuration) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -153,7 +151,6 @@ public struct AnySettingsGroupStyle: SettingsGroupStyle {
         }
     }
 
-    @MainActor
     public func makeBody(configuration: SettingsGroupStyleConfiguration) -> some View {
         _makeBody(configuration)
     }

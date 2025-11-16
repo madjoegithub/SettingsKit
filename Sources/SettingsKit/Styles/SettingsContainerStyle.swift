@@ -51,10 +51,11 @@ public struct SettingsContainerStyleConfiguration {
 // MARK: - Built-in Styles
 
 /// The default settings container style using NavigationStack and List.
+
+
 public struct DefaultSettingsContainerStyle: SettingsContainerStyle {
     public init() {}
 
-    @MainActor
     public func makeBody(configuration: Configuration) -> some View {
         NavigationStack(path: configuration.navigationPath) {
             List {
@@ -69,10 +70,11 @@ public struct DefaultSettingsContainerStyle: SettingsContainerStyle {
 }
 
 /// A settings container style using a split view with sidebar navigation.
+
+
 public struct SidebarSettingsContainerStyle: SettingsContainerStyle {
     public init() {}
 
-    @MainActor
     public func makeBody(configuration: Configuration) -> some View {
         NavigationSplitView {
             List {
@@ -87,10 +89,11 @@ public struct SidebarSettingsContainerStyle: SettingsContainerStyle {
 }
 
 /// A settings container style with a floating search bar.
+
+
 public struct FloatingSearchSettingsContainerStyle: SettingsContainerStyle {
     public init() {}
 
-    @MainActor
     public func makeBody(configuration: Configuration) -> some View {
         NavigationStack(path: configuration.navigationPath) {
             ZStack(alignment: .top) {
@@ -125,10 +128,11 @@ public struct FloatingSearchSettingsContainerStyle: SettingsContainerStyle {
 }
 
 /// A settings container style with grouped appearance.
+
+
 public struct GroupedSettingsContainerStyle: SettingsContainerStyle {
     public init() {}
 
-    @MainActor
     public func makeBody(configuration: Configuration) -> some View {
         NavigationStack(path: configuration.navigationPath) {
             List {
@@ -162,6 +166,8 @@ extension EnvironmentValues {
 // MARK: - Type Erasure
 
 /// A type-erased settings container style.
+
+
 public struct AnySettingsContainerStyle: SettingsContainerStyle {
     private let _makeBody: (SettingsContainerStyleConfiguration) -> AnyView
 
@@ -171,7 +177,6 @@ public struct AnySettingsContainerStyle: SettingsContainerStyle {
         }
     }
 
-    @MainActor
     public func makeBody(configuration: SettingsContainerStyleConfiguration) -> some View {
         _makeBody(configuration)
     }
@@ -219,7 +224,6 @@ public extension SettingsContainerStyle where Self == GroupedSettingsContainerSt
 // MARK: - Helper Extension
 
 extension View {
-    @MainActor
     @ViewBuilder
     func `if`<Transform: View>(_ condition: Bool, transform: (Self) -> Transform) -> some View {
         if condition {
