@@ -185,10 +185,18 @@ public struct SidebarSettingsStyle: SettingsStyle {
 
     public func makeContainer(configuration: ContainerConfiguration) -> some View {
         NavigationSplitView {
-            List {
-                configuration.content
+            if let searchText = configuration.searchText {
+                List {
+                    configuration.content
+                }
+                .navigationTitle(configuration.title)
+                .searchable(text: searchText, prompt: "Search settings")
+            } else {
+                List {
+                    configuration.content
+                }
+                .navigationTitle(configuration.title)
             }
-            .navigationTitle(configuration.title)
         } detail: {
             Text("Select a setting")
                 .foregroundStyle(.secondary)
@@ -209,8 +217,6 @@ public struct SidebarSettingsStyle: SettingsStyle {
         case .inline:
             Section {
                 configuration.content
-            } header: {
-                configuration.label
             } footer: {
                 if let footer = configuration.footer {
                     Text(footer)

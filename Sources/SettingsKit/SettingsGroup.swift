@@ -26,13 +26,17 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
         self.content = content()
     }
 
+    @Environment(\.settingsStyle) private var style
+
     public var body: some View {
-        StyledSettingsGroup(
-            title: title,
-            icon: icon,
-            footer: footer,
-            presentation: presentation,
-            content: content
+        style.makeGroup(
+            configuration: SettingsGroupConfiguration(
+                title: title,
+                icon: icon,
+                footer: footer,
+                presentation: presentation,
+                content: AnyView(content)
+            )
         )
     }
 
@@ -46,31 +50,6 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
             tags: tags,
             children: children
         )]
-    }
-}
-
-// MARK: - Styled Group View
-
-/// Internal view that applies the current group style from the environment.
-struct StyledSettingsGroup<Content: SettingsContent>: View {
-    let title: String
-    let icon: String?
-    let footer: String?
-    let presentation: SettingsGroupPresentation
-    let content: Content
-
-    @Environment(\.settingsStyle) private var style
-
-    var body: some View {
-        style.makeGroup(
-            configuration: SettingsGroupConfiguration(
-                title: title,
-                icon: icon,
-                footer: footer,
-                presentation: presentation,
-                content: AnyView(content)
-            )
-        )
     }
 }
 
