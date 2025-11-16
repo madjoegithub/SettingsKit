@@ -6,18 +6,48 @@ public struct SettingsView<Container: SettingsContainer>: View {
     let container: Container
     @State private var searchText = ""
     @State private var allNodes: [SettingsNode] = []
+    @State private var navigationPath: [String] = []
+    @Binding private var deepLinkPath: SettingsPath?
 
-    public init(_ container: Container) {
+    public init(_ container: Container, path: Binding<SettingsPath?> = .constant(nil)) {
         self.container = container
+        self._deepLinkPath = path
     }
 
     public var body: some View {
-        SettingsRenderView(content: container.body, searchText: $searchText, allNodes: $allNodes)
-            .searchable(text: $searchText, prompt: "Search settings")
-            .onAppear {
-                // Build the searchable index
-                allNodes = container.body.makeNodes()
+        NavigationStack(path: $navigationPath) {
+            SettingsRenderView(content: container.body, searchText: $searchText, allNodes: $allNodes)
+                .searchable(text: $searchText, prompt: "Search settings")
+                .onAppear {
+                    // Build the searchable index
+                    allNodes = container.body.makeNodes()
+                }
+                .navigationDestination(for: String.self) { groupTitle in
+                    // Find the group node and render its content
+                    if let groupNode = findNode(withTitle: groupTitle, in: allNodes) {
+                        GroupDetailView(node: groupNode, allNodes: allNodes)
+                    }
+                }
+                .onChange(of: deepLinkPath) { _, newPath in
+                    if let path = newPath {
+                        navigationPath = path.components
+                        deepLinkPath = nil // Clear after navigating
+                    }
+                }
+        }
+    }
+
+    private func findNode(withTitle title: String, in nodes: [SettingsNode]) -> SettingsNode? {
+        for node in nodes {
+            if node.title == title {
+                return node
             }
+            if let children = node.children,
+               let found = findNode(withTitle: title, in: children) {
+                return found
+            }
+        }
+        return nil
     }
 }
 

@@ -3,10 +3,27 @@ import SettingsKit
 
 @main
 struct SettingsKitDemoApp: App {
+    @State private var deepLinkPath: SettingsPath?
+
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                SettingsView(DemoSettings())
+            VStack {
+                // Deep link buttons for demo
+                HStack {
+                    Button("General") {
+                        deepLinkPath = SettingsPath("General")
+                    }
+                    Button("Keyboard") {
+                        deepLinkPath = SettingsPath("General", "Keyboard")
+                    }
+                    Button("VPN") {
+                        deepLinkPath = SettingsPath("General", "VPN & Device Management")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .padding()
+
+                SettingsView(DemoSettings(), path: $deepLinkPath)
                     .navigationTitle("Settings")
             }
         }
