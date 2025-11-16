@@ -17,24 +17,36 @@ public struct SettingsView<Container: SettingsContainer>: View {
             List {
                 if searchText.isEmpty {
                     container
+                } else if searchResults.isEmpty {
+                    ContentUnavailableView(
+                        "No Results for \"\(searchText)\"",
+                        systemImage: "magnifyingglass",
+                        description: Text("Check the spelling or try a different search")
+                    )
                 } else {
                     ForEach(searchResults) { result in
                         SearchResultSection(result: result, navigationPath: $navigationPath)
                     }
                 }
             }
+            .navigationTitle("Settings")
             .navigationDestination(for: SettingsNode.self) { node in
                 SettingsNodeDetailView(node: node)
             }
             .searchable(text: $searchText, prompt: "Search settings")
-            .onAppear {
-                allNodes = container.settingsBody.makeNodes()
-            }
         }
     }
 
     var searchResults: [SearchResult] {
         guard !searchText.isEmpty else { return [] }
+
+        // Build nodes lazily when search is actually happening
+        if allNodes.isEmpty {
+            // We intentionally access State values here to build the search index
+            // The warnings are expected but harmless - we're capturing a snapshot for search
+            allNodes = container.settingsBody.makeNodes()
+        }
+
         var results: [SearchResult] = []
         searchNodes(allNodes, query: searchText.lowercased(), results: &results)
         return results

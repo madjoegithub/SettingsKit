@@ -35,7 +35,7 @@ public protocol SettingsGroup: SettingsContent {
     associatedtype SettingsBody: SettingsContent
 
     /// The display title for this group
-    var title: String { get }
+    var title: LocalizedStringKey { get }
 
     /// Optional SF Symbol icon name
     var icon: String? { get }
@@ -47,7 +47,7 @@ public protocol SettingsGroup: SettingsContent {
     var style: SettingsGroupStyle { get }
 
     /// Optional footer text (only shown for inline style)
-    var footer: String? { get }
+    var footer: LocalizedStringKey? { get }
 
     @SettingsContentBuilder
     var settingsBody: SettingsBody { get }
@@ -70,6 +70,7 @@ public extension SettingsGroup {
                 InlineGroupView(group: self, footer: footer)
             }
         }
+        
     }
 
     func makeNodes() -> [SettingsNode] {

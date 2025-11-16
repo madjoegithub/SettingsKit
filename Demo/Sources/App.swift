@@ -6,7 +6,6 @@ struct SettingsKitDemoApp: App {
     var body: some Scene {
         WindowGroup {
             SettingsView(DemoSettings())
-                .navigationTitle("Settings")
         }
     }
 }
