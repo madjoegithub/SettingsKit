@@ -32,60 +32,55 @@ struct SettingsRenderView<Content: SettingsContent>: View {
             if searchText.isEmpty {
                 content
             } else {
-                ForEach(groupedResults.keys.sorted(), id: \.self) { groupTitle in
-                    Section(groupTitle) {
-                        ForEach(groupedResults[groupTitle] ?? []) { node in
-                            SearchResultView(node: node)
-                        }
-                    }
+                ForEach(filteredResults) { node in
+                    SearchResultView(node: node)
                 }
             }
         }
     }
 
-    var groupedResults: [String: [SettingsNode]] {
-        var grouped: [String: [SettingsNode]] = [:]
-        searchNodes(allNodes, query: searchText.lowercased(), parentTitle: nil, results: &grouped)
-        return grouped
+    var filteredResults: [SettingsNode] {
+        var results: [SettingsNode] = []
+        flatSearchNodes(allNodes, query: searchText.lowercased(), results: &results)
+        return results
     }
 
-    func searchNodes(_ nodes: [SettingsNode], query: String, parentTitle: String?, results: inout [String: [SettingsNode]]) {
+    func flatSearchNodes(_ nodes: [SettingsNode], query: String, results: inout [SettingsNode]) {
         for node in nodes {
             let matches = node.title.lowercased().contains(query) ||
                          node.tags.contains(where: { $0.lowercased().contains(query) })
 
             if matches {
-                let sectionTitle = parentTitle ?? "Settings"
-                if results[sectionTitle] == nil {
-                    results[sectionTitle] = []
-                }
-                results[sectionTitle]?.append(node)
+                results.append(node)
             }
 
             // Recursively search children
             if let children = node.children {
-                searchNodes(children, query: query, parentTitle: node.title, results: &results)
+                flatSearchNodes(children, query: query, results: &results)
             }
         }
     }
+
 }
 
 /// View for rendering a search result
 struct SearchResultView: View {
     let node: SettingsNode
+    let breadcrumb: String?
+
+    init(node: SettingsNode, breadcrumb: String? = nil) {
+        self.node = node
+        self.breadcrumb = breadcrumb
+    }
 
     var body: some View {
         switch node {
-        case .group(_, let title, let icon, _, let children):
-            NavigationLink {
-                List {
-                    ForEach(children) { child in
-                        SearchResultView(node: child)
-                    }
+        case .group(_, let title, _, _, let children):
+            // Render as a section with the group title as header
+            Section(title) {
+                ForEach(children) { child in
+                    SearchResultView(node: child)
                 }
-                .navigationTitle(title)
-            } label: {
-                Label(title, systemImage: icon ?? "folder")
             }
 
         case .item(_, _, let icon, _, let content):
