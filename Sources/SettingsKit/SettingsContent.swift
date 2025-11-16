@@ -89,12 +89,13 @@ public extension SettingsGroup {
                         tags: childTags + tags + [title], // Add inline group's title and tags
                         children: grandchildren
                     )
-                case .item(let id, let childTitle, let icon, let childTags, let content):
+                case .item(let id, let childTitle, let icon, let childTags, let searchable, let content):
                     return .item(
                         id: id,
                         title: childTitle,
                         icon: icon,
                         tags: childTags + tags + [title], // Add inline group's title and tags
+                        searchable: searchable,
                         content: content
                     )
                 }

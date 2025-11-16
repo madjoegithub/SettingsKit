@@ -44,8 +44,9 @@ public struct SettingsView<Container: SettingsContainer>: View {
                 let isLeafGroup = children.allSatisfy { !$0.isGroup }
 
                 if isLeafGroup {
-                    // Leaf group: check if group or any children match
-                    let childMatches = children.contains { child in
+                    // Leaf group: check if group or any searchable children match
+                    let searchableChildren = children.filter { $0.isSearchable }
+                    let childMatches = searchableChildren.contains { child in
                         child.title.lowercased().contains(query) ||
                         child.tags.contains(where: { $0.lowercased().contains(query) })
                     }
@@ -120,7 +121,7 @@ struct SearchResultItem: View {
                 SearchResultItem(node: child)
             }
 
-        case .item(_, _, let icon, _, let content):
+        case .item(_, _, let icon, _, _, let content):
             HStack {
                 if let icon = icon {
                     Image(systemName: icon)
@@ -151,7 +152,7 @@ struct NodeView: View {
                 Label(title, systemImage: icon ?? "folder")
             }
 
-        case .item(_, let title, let icon, _, let content):
+        case .item(_, _, let icon, _, _, let content):
             // For items, show the title/icon and render the user's view
             HStack {
                 if let icon = icon {

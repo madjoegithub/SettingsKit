@@ -15,6 +15,7 @@ public enum SettingsNode: Identifiable, @unchecked Sendable {
         title: String,
         icon: String?,
         tags: [String],
+        searchable: Bool,
         content: AnyView
     )
 
@@ -22,7 +23,7 @@ public enum SettingsNode: Identifiable, @unchecked Sendable {
         switch self {
         case .group(let id, _, _, _, _):
             return id
-        case .item(let id, _, _, _, _):
+        case .item(let id, _, _, _, _, _):
             return id
         }
     }
@@ -31,7 +32,7 @@ public enum SettingsNode: Identifiable, @unchecked Sendable {
         switch self {
         case .group(_, let title, _, _, _):
             return title
-        case .item(_, let title, _, _, _):
+        case .item(_, let title, _, _, _, _):
             return title
         }
     }
@@ -40,7 +41,7 @@ public enum SettingsNode: Identifiable, @unchecked Sendable {
         switch self {
         case .group(_, _, let icon, _, _):
             return icon
-        case .item(_, _, let icon, _, _):
+        case .item(_, _, let icon, _, _, _):
             return icon
         }
     }
@@ -49,8 +50,17 @@ public enum SettingsNode: Identifiable, @unchecked Sendable {
         switch self {
         case .group(_, _, _, let tags, _):
             return tags
-        case .item(_, _, _, let tags, _):
+        case .item(_, _, _, let tags, _, _):
             return tags
+        }
+    }
+
+    public var isSearchable: Bool {
+        switch self {
+        case .group:
+            return true
+        case .item(_, _, _, _, let searchable, _):
+            return searchable
         }
     }
 

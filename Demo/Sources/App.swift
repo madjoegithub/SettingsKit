@@ -162,15 +162,16 @@ struct WiFiItem: SettingsGroup {
     var title: String { "Wi-Fi" }
     var icon: String? { "wifi" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Network") { Text("Tabley 5").foregroundStyle(.secondary) }
+        SettingsItem("Network", searchable: false) { Text("Tabley 5").foregroundStyle(.secondary) }
     }
 }
 
 struct BluetoothItem: SettingsGroup {
+    @State private var enabled = true
     var title: String { "Bluetooth" }
     var icon: String? { "wave.3.right" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Status") { Text("On").foregroundStyle(.secondary) }
+        SettingsItem("Toggle") { Toggle("Enabled", isOn: $enabled) }
     }
 }
 
@@ -178,15 +179,16 @@ struct CellularItem: SettingsGroup {
     var title: String { "Cellular" }
     var icon: String? { "antenna.radiowaves.left.and.right" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Data") { Text("5G").foregroundStyle(.secondary) }
+        SettingsItem("Data", searchable: false) { Text("5G").foregroundStyle(.secondary) }
     }
 }
 
 struct PersonalHotspotItem: SettingsGroup {
+    @State private var enabled = false
     var title: String { "Personal Hotspot" }
     var icon: String? { "personalhotspot" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Status") { Text("Off").foregroundStyle(.secondary) }
+        SettingsItem("Toggle") { Toggle("Enabled", isOn: $enabled) }
     }
 }
 
@@ -194,7 +196,7 @@ struct BatteryItem: SettingsGroup {
     var title: String { "Battery" }
     var icon: String? { "battery.100" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Level") { Text("94%").foregroundStyle(.secondary) }
+        SettingsItem("Level", searchable: false) { Text("94%").foregroundStyle(.secondary) }
     }
 }
 
@@ -202,7 +204,7 @@ struct VPNItem: SettingsGroup {
     var title: String { "VPN" }
     var icon: String? { "network" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Status") { Text("Not Connected").foregroundStyle(.secondary) }
+        SettingsItem("Status", searchable: false) { Text("Not Connected").foregroundStyle(.secondary) }
     }
 }
 
