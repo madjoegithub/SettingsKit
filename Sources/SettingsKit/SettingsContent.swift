@@ -65,17 +65,9 @@ public extension SettingsGroup {
         Group {
             switch style {
             case .navigation:
-                SettingsGroupView(title: title, icon: icon) {
-                    settingsBody
-                }
+                SettingsGroupView(title: title, icon: icon, group: self)
             case .inline:
-                Section {
-                    settingsBody
-                } footer: {
-                    if let footer = footer {
-                        Text(footer)
-                    }
-                }
+                InlineGroupView(group: self, footer: footer)
             }
         }
     }

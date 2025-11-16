@@ -5,10 +5,8 @@ import SettingsKit
 struct SettingsKitDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                SettingsView(DemoSettings())
-                    .navigationTitle("Settings")
-            }
+            SettingsView(DemoSettings())
+                .navigationTitle("Settings")
         }
     }
 }

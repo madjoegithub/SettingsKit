@@ -6,24 +6,30 @@ public struct SettingsView<Container: SettingsContainer>: View {
     let container: Container
     @State private var searchText = ""
     @State private var allNodes: [SettingsNode] = []
+    @State private var navigationPath = NavigationPath()
 
     public init(_ container: Container) {
         self.container = container
     }
 
     public var body: some View {
-        List {
-            if searchText.isEmpty {
-                container.settingsBody
-            } else {
-                ForEach(searchResults) { result in
-                    SearchResultSection(result: result)
+        NavigationStack(path: $navigationPath) {
+            List {
+                if searchText.isEmpty {
+                    container
+                } else {
+                    ForEach(searchResults) { result in
+                        SearchResultSection(result: result, navigationPath: $navigationPath)
+                    }
                 }
             }
-        }
-        .searchable(text: $searchText, prompt: "Search settings")
-        .onAppear {
-            allNodes = container.settingsBody.makeNodes()
+            .navigationDestination(for: SettingsNode.self) { node in
+                SettingsNodeDetailView(node: node)
+            }
+            .searchable(text: $searchText, prompt: "Search settings")
+            .onAppear {
+                allNodes = container.settingsBody.makeNodes()
+            }
         }
     }
 
@@ -77,21 +83,17 @@ struct SearchResult: Identifiable {
 /// Renders a search result section with tappable header
 struct SearchResultSection: View {
     let result: SearchResult
+    @Binding var navigationPath: NavigationPath
 
     var body: some View {
-        if case .group(_, let title, let icon, _, let children) = result.group {
+        if case .group(_, let title, let icon, _, _) = result.group {
             Section {
                 ForEach(result.matchedItems) { item in
                     SearchResultItem(node: item)
                 }
             } header: {
-                NavigationLink {
-                    List {
-                        ForEach(children) { child in
-                            NodeView(node: child)
-                        }
-                    }
-                    .navigationTitle(title)
+                Button {
+                    navigationPath.append(result.group)
                 } label: {
                     HStack {
                         if let icon = icon {
@@ -133,22 +135,31 @@ struct SearchResultItem: View {
     }
 }
 
+/// Detail view for a settings node (used in programmatic navigation)
+struct SettingsNodeDetailView: View {
+    let node: SettingsNode
+
+    var body: some View {
+        if case .group(_, let title, _, _, let children) = node {
+            List {
+                ForEach(children) { child in
+                    NodeView(node: child)
+                }
+            }
+            .navigationTitle(title)
+        }
+    }
+}
+
 /// Internal view for rendering a single node (group or item)
 struct NodeView: View {
     let node: SettingsNode
 
     var body: some View {
         switch node {
-        case .group(_, let title, let icon, _, let children):
-            // For groups, create a navigation link to a list of children
-            NavigationLink {
-                List {
-                    ForEach(children) { child in
-                        NodeView(node: child)
-                    }
-                }
-                .navigationTitle(title)
-            } label: {
+        case .group(_, let title, let icon, _, _):
+            // For groups, create a navigation link
+            NavigationLink(value: node) {
                 Label(title, systemImage: icon ?? "folder")
             }
 

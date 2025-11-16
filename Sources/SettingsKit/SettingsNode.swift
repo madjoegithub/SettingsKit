@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Internal representation of the settings tree structure.
 /// This is what we use to power search, navigation, and rendering.
-public enum SettingsNode: Identifiable, @unchecked Sendable {
+public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
     case group(
         id: UUID,
         title: String,
@@ -78,5 +78,13 @@ public enum SettingsNode: Identifiable, @unchecked Sendable {
             return true
         }
         return false
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    public static func == (lhs: SettingsNode, rhs: SettingsNode) -> Bool {
+        lhs.id == rhs.id
     }
 }
