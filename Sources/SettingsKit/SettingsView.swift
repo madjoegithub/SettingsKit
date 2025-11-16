@@ -1,17 +1,17 @@
 import SwiftUI
 
-/// Main view for rendering settings content.
-struct SettingsView<Content: SettingsContent>: View {
-    let content: Content
+/// Main view for rendering a settings container.
+public struct SettingsView<Container: SettingsContainer>: View {
+    let container: Container
     @State private var searchText = ""
     @State private var navigationPath = NavigationPath()
     @Environment(\.settingsStyle) private var style
 
-    init(content: Content) {
-        self.content = content
+    public init(container: Container) {
+        self.container = container
     }
 
-    var body: some View {
+    public var body: some View {
         style.makeContainer(
             configuration: SettingsContainerConfiguration(
                 title: "Settings",
@@ -28,7 +28,7 @@ struct SettingsView<Content: SettingsContent>: View {
     @ViewBuilder
     private var contentView: some View {
         if searchText.isEmpty {
-            content
+            container.settingsBody
         } else if searchResults.isEmpty {
             ContentUnavailableView(
                 "No Results for \"\(searchText)\"",
@@ -46,7 +46,7 @@ struct SettingsView<Content: SettingsContent>: View {
         guard !searchText.isEmpty else { return [] }
 
         // Build fresh nodes on every search to get live state
-        let allNodes = content.makeNodes()
+        let allNodes = container.settingsBody.makeNodes()
 
         var results: [SearchResult] = []
         searchNodes(allNodes, query: searchText.lowercased(), results: &results)

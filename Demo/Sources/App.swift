@@ -82,11 +82,10 @@ struct SettingsKitDemoApp: App {
     }
 }
 
-struct DemoSettings: View {
+struct DemoSettings: SettingsContainer {
     @Bindable var state: SettingsState
-    
-    var body: some View {
-        SettingsContainer {
+
+    var settingsBody: some SettingsContent {
             SettingsGroup("Profile", systemImage: "person.crop.circle.fill") {
                 SettingsItem("Account Info") {
                     VStack(alignment: .leading) {
@@ -373,5 +372,4 @@ struct DemoSettings: View {
             }
             
         }
-    }
 }
