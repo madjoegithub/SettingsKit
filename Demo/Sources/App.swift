@@ -1,22 +1,23 @@
 import SwiftUI
 import SettingsKit
 
-// MARK: - Custom Styles
+// MARK: - Custom Style
 
-struct CustomContainerStyle: SettingsContainerStyle {
-    func makeBody(configuration: Configuration) -> some View {
+struct CustomSettingsStyle: SettingsStyle {
+    func makeContainer(configuration: ContainerConfiguration) -> some View {
         NavigationStack(path: configuration.navigationPath) {
             ScrollView {
-                configuration.content
+                VStack(spacing: 16) {
+                    configuration.content
+                }
+                .padding()
             }
             .navigationTitle(configuration.title)
             .background(Color.blue.opacity(0.05))
         }
     }
-}
 
-struct CustomGroupStyle: SettingsGroupStyle {
-    func makeBody(configuration: Configuration) -> some View {
+    func makeGroup(configuration: GroupConfiguration) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             configuration.label
                 .font(.headline)
@@ -28,10 +29,8 @@ struct CustomGroupStyle: SettingsGroupStyle {
         .background(Color.purple.opacity(0.1))
         .cornerRadius(12)
     }
-}
 
-struct CustomItemStyle: SettingsItemStyle {
-    func makeBody(configuration: Configuration) -> some View {
+    func makeItem(configuration: ItemConfiguration) -> some View {
         HStack {
             configuration.label
                 .foregroundColor(.green)
@@ -77,8 +76,7 @@ struct SettingsKitDemoApp: App {
     var body: some Scene {
         WindowGroup {
             SettingsView(DemoSettings(state: state))
-                .settingsContainerStyle(.sidebar)  // Custom container style demo
-                .settingsItemStyle(CustomItemStyle())  // Custom item style demo - applies to all items
+                .settingsStyle(.card)  // Use the default settings style
         }
     }
 }
@@ -99,8 +97,8 @@ struct DemoSettings: SettingsContainer {
             }
         }
 
-        // Quick Settings Sections
-        SettingsGroup("Connections") {
+        // Quick Settings Sections (inline presentation)
+        SettingsGroup("Connections", .inline) {
             SettingsGroup("Airplane Mode", systemImage: "airplane") {
                 SettingsItem("Toggle") { Toggle("Enabled", isOn: $state.airplaneModeEnabled) }
             }
@@ -121,9 +119,8 @@ struct DemoSettings: SettingsContainer {
                 SettingsItem("Toggle") { Toggle("Enabled", isOn: $state.personalHotspotEnabled) }
             }
         }
-        .settingsGroupStyle(.inline)
 
-        SettingsGroup("Battery") {
+        SettingsGroup("Battery", .inline) {
             SettingsGroup("Battery", systemImage: "battery.100") {
                 SettingsItem("Level", searchable: false) { Text("94%").foregroundStyle(.secondary) }
             }
@@ -132,12 +129,11 @@ struct DemoSettings: SettingsContainer {
                 SettingsItem("Toggle") { Toggle("Enabled", isOn: $state.vpnQuickEnabled) }
             }
         }
-        .settingsGroupStyle(.inline)
 
         // Main Settings
-        SettingsGroup("Main") {
+        SettingsGroup("Main", .inline) {
             SettingsGroup("General", systemImage: "gearshape") {
-                SettingsGroup("Device Information") {
+                SettingsGroup("Device Information", .inline) {
                     SettingsGroup("About", systemImage: "info.circle") {
                         SettingsItem("Device Name") {
                             Text("iPhone")
@@ -156,9 +152,8 @@ struct DemoSettings: SettingsContainer {
                         }
                     }
                 }
-                .settingsGroupStyle(.inline)
 
-                SettingsGroup("Connectivity", footer: "Manage how your device connects and shares content with other devices.") {
+                SettingsGroup("Connectivity", .inline, footer: "Manage how your device connects and shares content with other devices.") {
                     SettingsGroup("AirDrop", systemImage: "airplayaudio") {
                         SettingsItem("Receiving", icon: "person.crop.circle") {
                             Toggle("Receiving", isOn: $state.airDropEnabled)
@@ -202,18 +197,16 @@ struct DemoSettings: SettingsContainer {
                         }
                     }
                 }
-                .settingsGroupStyle(.inline)
 
-                SettingsGroup("System") {
+                SettingsGroup("System", .inline) {
                     SettingsGroup("CarPlay", systemImage: "car") {
                         SettingsItem("Status") {
                             Text("Not Connected")
                         }
                     }
                 }
-                .settingsGroupStyle(.inline)
 
-                SettingsGroup("Settings & Privacy") {
+                SettingsGroup("Settings & Privacy", .inline) {
                     SettingsGroup("AutoFill & Passwords", systemImage: "key.fill") {
                         SettingsItem("AutoFill Passwords", icon: "key") {
                             Toggle("AutoFill", isOn: $state.autoFillPasswords)
@@ -247,7 +240,6 @@ struct DemoSettings: SettingsContainer {
                         }
                     }
                 }
-                .settingsGroupStyle(.inline)
             }
 
             SettingsGroup("Accessibility", systemImage: "figure.arms.open") {
@@ -278,9 +270,8 @@ struct DemoSettings: SettingsContainer {
                 SettingsItem("Layout", searchable: false) { Text("Standard").foregroundStyle(.secondary) }
             }
         }
-        .settingsGroupStyle(.inline)
 
-        SettingsGroup("Display & Interface") {
+        SettingsGroup("Display & Interface", .inline) {
             SettingsGroup("Search", systemImage: "magnifyingglass") {
                 SettingsItem("Siri Suggestions") { Toggle("Enabled", isOn: $state.siriSuggestions) }
             }
@@ -293,9 +284,8 @@ struct DemoSettings: SettingsContainer {
                 SettingsItem("Current", searchable: false) { Text("Dynamic").foregroundStyle(.secondary) }
             }
         }
-        .settingsGroupStyle(.inline)
 
-        SettingsGroup("Notifications & Focus") {
+        SettingsGroup("Notifications & Focus", .inline) {
             SettingsGroup("Notifications", systemImage: "bell.badge.fill") {
                 SettingsItem("Scheduled", searchable: false) { Text("3 apps").foregroundStyle(.secondary) }
             }
@@ -312,9 +302,8 @@ struct DemoSettings: SettingsContainer {
                 SettingsItem("Usage", searchable: false) { Text("See Report").foregroundStyle(.secondary) }
             }
         }
-        .settingsGroupStyle(.inline)
 
-        SettingsGroup("Safety & Privacy") {
+        SettingsGroup("Safety & Privacy", .inline) {
             SettingsGroup("Emergency SOS", systemImage: "sos") {
                 SettingsItem("Settings", searchable: false) { Text("Configure").foregroundStyle(.secondary) }
             }
@@ -323,9 +312,8 @@ struct DemoSettings: SettingsContainer {
                 SettingsItem("Permissions", searchable: false) { Text("Review").foregroundStyle(.secondary) }
             }
         }
-        .settingsGroupStyle(.inline)
 
-        SettingsGroup("Cloud & Services") {
+        SettingsGroup("Cloud & Services", .inline) {
             SettingsGroup("Game Center", systemImage: "gamecontroller.fill") {
                 SettingsItem("Profile", searchable: false) { Text("Aether").foregroundStyle(.secondary) }
             }
@@ -338,16 +326,14 @@ struct DemoSettings: SettingsContainer {
                 SettingsItem("Cards", searchable: false) { Text("2 cards").foregroundStyle(.secondary) }
             }
         }
-        .settingsGroupStyle(.inline)
 
-        SettingsGroup("Applications") {
+        SettingsGroup("Applications", .inline) {
             SettingsGroup("Apps", systemImage: "square.grid.3x3.fill") {
                 SettingsItem("Installed", searchable: false) { Text("120 apps").foregroundStyle(.secondary) }
             }
         }
-        .settingsGroupStyle(.inline)
 
-        SettingsGroup("Developer") {
+        SettingsGroup("Developer", .inline) {
             SettingsGroup("Advanced", systemImage: "hammer") {
                 SettingsItem("Debug Mode", icon: "ladybug") {
                     Toggle("Debug Mode", isOn: $state.debugMode)
@@ -376,8 +362,6 @@ struct DemoSettings: SettingsContainer {
                     Toggle("Dark Mode", isOn: $state.darkMode)
                 }
             }
-            .settingsGroupStyle(CustomGroupStyle())  // Custom group style demo
         }
-        .settingsGroupStyle(.inline)
     }
 }

@@ -5,15 +5,15 @@ public struct SettingsView<Container: SettingsContainer>: View {
     let container: Container
     @State private var searchText = ""
     @State private var navigationPath = NavigationPath()
-    @Environment(\.settingsContainerStyle) private var containerStyle
+    @Environment(\.settingsStyle) private var style
 
     public init(_ container: Container) {
         self.container = container
     }
 
     public var body: some View {
-        containerStyle.makeBody(
-            configuration: SettingsContainerStyleConfiguration(
+        style.makeContainer(
+            configuration: SettingsContainerConfiguration(
                 title: "Settings",
                 content: AnyView(contentView),
                 searchText: $searchText,

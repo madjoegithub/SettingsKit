@@ -52,11 +52,11 @@ struct StyledSettingsItem<Content: View>: View {
     let icon: String?
     let content: Content
 
-    @Environment(\.settingsItemStyle) private var itemStyle
+    @Environment(\.settingsStyle) private var style
 
     var body: some View {
-        itemStyle.makeBody(
-            configuration: SettingsItemStyleConfiguration(
+        style.makeItem(
+            configuration: SettingsItemConfiguration(
                 title: title,
                 icon: icon,
                 content: AnyView(content)
