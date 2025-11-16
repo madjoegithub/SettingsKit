@@ -97,11 +97,6 @@ struct DemoSettings: SettingsContainer {
                     }
                 }
             }
-            .toolbar{
-                Button("test"){
-                    
-                }
-            }
             
             
             // Quick Settings Sections (inline presentation)

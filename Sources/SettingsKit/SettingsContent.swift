@@ -8,6 +8,32 @@ public protocol SettingsContent: View, Sendable {
     func makeNodes() -> [SettingsNode]
 }
 
+public extension SettingsContent {
+    /// Default implementation that extracts nodes from the body.
+    ///
+    /// This allows you to create custom `SettingsContent` types without manually
+    /// implementing `makeNodes()`:
+    ///
+    /// ```swift
+    /// struct ProfileSettingsGroup: SettingsContent {
+    ///     var body: some SettingsContent {
+    ///         SettingsGroup("Profile") {
+    ///             SettingsItem("Name") { ... }
+    ///             SettingsItem("Email") { ... }
+    ///         }
+    ///     }
+    ///     // makeNodes() is automatic! ✅
+    /// }
+    /// ```
+    func makeNodes() -> [SettingsNode] {
+        // Extract nodes from body if it conforms to SettingsContent
+        if let content = body as? any SettingsContent {
+            return content.makeNodes()
+        }
+        return []
+    }
+}
+
 /// A container for settings content, typically the root-level settings view.
 public protocol SettingsContainer: View {
     associatedtype SettingsBody: SettingsContent
