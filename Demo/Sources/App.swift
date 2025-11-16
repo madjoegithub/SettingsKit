@@ -77,7 +77,7 @@ struct SettingsKitDemoApp: App {
     var body: some Scene {
         WindowGroup {
             SettingsView(DemoSettings(state: state))
-                .settingsStyle(.default)  // Use the default settings style
+                .settingsStyle(.sidebar)
         }
     }
 }
