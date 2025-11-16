@@ -217,8 +217,6 @@ public struct SidebarSettingsStyle: SettingsStyle {
         case .inline:
             Section {
                 configuration.content
-            } header: {
-                configuration.label
             } footer: {
                 if let footer = configuration.footer {
                     Text(footer)
