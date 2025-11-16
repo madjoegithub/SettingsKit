@@ -8,6 +8,7 @@ public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
         title: String,
         icon: String?,
         tags: [String],
+        style: SettingsGroupStyle,
         children: [SettingsNode]
     )
     case item(
@@ -21,7 +22,7 @@ public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
 
     public var id: UUID {
         switch self {
-        case .group(let id, _, _, _, _):
+        case .group(let id, _, _, _, _, _):
             return id
         case .item(let id, _, _, _, _, _):
             return id
@@ -30,7 +31,7 @@ public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
 
     public var title: String {
         switch self {
-        case .group(_, let title, _, _, _):
+        case .group(_, let title, _, _, _, _):
             return title
         case .item(_, let title, _, _, _, _):
             return title
@@ -39,7 +40,7 @@ public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
 
     public var icon: String? {
         switch self {
-        case .group(_, _, let icon, _, _):
+        case .group(_, _, let icon, _, _, _):
             return icon
         case .item(_, _, let icon, _, _, _):
             return icon
@@ -48,7 +49,7 @@ public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
 
     public var tags: [String] {
         switch self {
-        case .group(_, _, _, let tags, _):
+        case .group(_, _, _, let tags, _, _):
             return tags
         case .item(_, _, _, let tags, _, _):
             return tags
@@ -66,7 +67,7 @@ public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
 
     public var children: [SettingsNode]? {
         switch self {
-        case .group(_, _, _, _, let children):
+        case .group(_, _, _, _, _, let children):
             return children
         case .item:
             return nil

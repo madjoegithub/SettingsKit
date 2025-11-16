@@ -39,38 +39,16 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
     public func makeNodes() -> [SettingsNode] {
         let children = content.makeNodes()
 
-        if style == .inline {
-            // Inline groups are transparent but their children inherit the inline group's title/tags for search
-            return children.map { child in
-                switch child {
-                case .group(let id, let childTitle, let icon, let childTags, let grandchildren):
-                    return .group(
-                        id: id,
-                        title: childTitle,
-                        icon: icon,
-                        tags: childTags + tags + [title],
-                        children: grandchildren
-                    )
-                case .item(let id, let childTitle, let icon, let childTags, let searchable, let content):
-                    return .item(
-                        id: id,
-                        title: childTitle,
-                        icon: icon,
-                        tags: childTags + tags + [title],
-                        searchable: searchable,
-                        content: content
-                    )
-                }
-            }
-        } else {
-            return [.group(
-                id: id,
-                title: title,
-                icon: icon,
-                tags: tags,
-                children: children
-            )]
-        }
+        // All groups create nodes for themselves, both inline and navigation
+        // The style is stored in the node to control rendering
+        return [.group(
+            id: id,
+            title: title,
+            icon: icon,
+            tags: tags,
+            style: style,
+            children: children
+        )]
     }
 }
 
