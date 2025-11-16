@@ -30,7 +30,20 @@ public struct SettingsContentBuilder {
         expression
     }
 
-    // Allow arbitrary Views to be included (they just won't contribute to the node tree)
+    /// Allow arbitrary Views to be included in the settings hierarchy.
+    ///
+    /// This enables view modifiers and custom views to be used within `SettingsContainer`:
+    /// ```swift
+    /// SettingsContainer {
+    ///     SettingsGroup("Apps") { ... }
+    ///     .toolbar { }  // ✅ Works - wrapped as ViewWrapper
+    ///
+    ///     Text("Custom content")  // ✅ Works - wrapped as ViewWrapper
+    /// }
+    /// ```
+    ///
+    /// - Note: Arbitrary views are rendered but don't contribute to search/navigation.
+    ///   Only `SettingsGroup` and `SettingsItem` are searchable.
     @preconcurrency
     public static func buildExpression<V: View>(_ view: V) -> SettingsContent {
         ViewWrapper(view)
@@ -48,10 +61,25 @@ struct EmptySettingsContent: SettingsContent {
     }
 }
 
-/// Wraps an arbitrary View as SettingsContent (doesn't contribute to search/navigation)
+/// Wraps an arbitrary View as SettingsContent.
+///
+/// This wrapper allows any SwiftUI view to be used within the `@SettingsContentBuilder`,
+/// enabling view modifiers like `.toolbar { }` and custom views to be included in the
+/// settings hierarchy.
+///
+/// The wrapper renders the view normally but returns an empty node array from `makeNodes()`,
+/// meaning these views won't appear in search results or contribute to navigation structure.
+/// Only `SettingsGroup` and `SettingsItem` contribute to the searchable node tree.
+///
+/// - Note: Uses `nonisolated(unsafe)` for concurrency safety. This is safe because views
+///   are UI state that always execute on the main thread, even though the compiler can't
+///   verify this at compile time.
 struct ViewWrapper: SettingsContent {
+    /// The wrapped view content stored as type-erased AnyView.
     nonisolated(unsafe) let content: AnyView
 
+    /// Creates a wrapper around any view.
+    /// - Parameter content: The view to wrap as SettingsContent.
     nonisolated init<Content: View>(_ content: Content) {
         self.content = AnyView(content)
     }
@@ -60,6 +88,7 @@ struct ViewWrapper: SettingsContent {
         content
     }
 
+    /// Returns an empty array since arbitrary views don't contribute to search/navigation.
     func makeNodes() -> [SettingsNode] {
         []
     }
