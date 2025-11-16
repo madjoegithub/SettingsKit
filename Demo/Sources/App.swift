@@ -201,10 +201,11 @@ struct BatteryItem: SettingsGroup {
 }
 
 struct VPNItem: SettingsGroup {
+    @State private var enabled = false
     var title: String { "VPN" }
     var icon: String? { "network" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Status", searchable: false) { Text("Not Connected").foregroundStyle(.secondary) }
+        SettingsItem("Toggle") { Toggle("Enabled", isOn: $enabled) }
     }
 }
 
@@ -213,7 +214,7 @@ struct AccessibilityItem: SettingsGroup {
     var title: String { "Accessibility" }
     var icon: String? { "figure.arms.open" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Options") { Text("Configure").foregroundStyle(.secondary) }
+        SettingsItem("Options", searchable: false) { Text("Configure").foregroundStyle(.secondary) }
     }
 }
 
@@ -221,15 +222,16 @@ struct ActionButtonItem: SettingsGroup {
     var title: String { "Action Button" }
     var icon: String? { "button.programmable" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Action") { Text("Shortcuts").foregroundStyle(.secondary) }
+        SettingsItem("Action", searchable: false) { Text("Shortcuts").foregroundStyle(.secondary) }
     }
 }
 
 struct AppleIntelligenceItem: SettingsGroup {
+    @State private var enabled = true
     var title: String { "Apple Intelligence & Siri" }
     var icon: String? { "apple.logo" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Status") { Text("Enabled").foregroundStyle(.secondary) }
+        SettingsItem("Toggle") { Toggle("Enabled", isOn: $enabled) }
     }
 }
 
@@ -237,7 +239,7 @@ struct CameraItem: SettingsGroup {
     var title: String { "Camera" }
     var icon: String? { "camera.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Settings") { Text("Configure").foregroundStyle(.secondary) }
+        SettingsItem("Settings", searchable: false) { Text("Configure").foregroundStyle(.secondary) }
     }
 }
 
@@ -245,15 +247,16 @@ struct ControlCenterItem: SettingsGroup {
     var title: String { "Control Center" }
     var icon: String? { "switch.2" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Controls") { Text("Customize").foregroundStyle(.secondary) }
+        SettingsItem("Controls", searchable: false) { Text("Customize").foregroundStyle(.secondary) }
     }
 }
 
 struct DisplayBrightnessItem: SettingsGroup {
+    @State private var autoBrightness = true
     var title: String { "Display & Brightness" }
     var icon: String? { "sun.max.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Brightness") { Text("Auto").foregroundStyle(.secondary) }
+        SettingsItem("Auto-Brightness") { Toggle("Auto", isOn: $autoBrightness) }
     }
 }
 
@@ -261,23 +264,25 @@ struct HomeScreenItem: SettingsGroup {
     var title: String { "Home Screen & App Library" }
     var icon: String? { "square.grid.2x2" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Layout") { Text("Standard").foregroundStyle(.secondary) }
+        SettingsItem("Layout", searchable: false) { Text("Standard").foregroundStyle(.secondary) }
     }
 }
 
 struct SearchItem: SettingsGroup {
+    @State private var siriSuggestions = true
     var title: String { "Search" }
     var icon: String? { "magnifyingglass" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Siri Suggestions") { Text("Enabled").foregroundStyle(.secondary) }
+        SettingsItem("Siri Suggestions") { Toggle("Enabled", isOn: $siriSuggestions) }
     }
 }
 
 struct StandByItem: SettingsGroup {
+    @State private var autoStandby = true
     var title: String { "StandBy" }
     var icon: String? { "platter.2.filled.iphone" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Mode") { Text("Automatic").foregroundStyle(.secondary) }
+        SettingsItem("Automatic") { Toggle("Auto", isOn: $autoStandby) }
     }
 }
 
@@ -285,7 +290,7 @@ struct WallpaperItem: SettingsGroup {
     var title: String { "Wallpaper" }
     var icon: String? { "photo.on.rectangle" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Current") { Text("Dynamic").foregroundStyle(.secondary) }
+        SettingsItem("Current", searchable: false) { Text("Dynamic").foregroundStyle(.secondary) }
     }
 }
 
@@ -293,7 +298,7 @@ struct NotificationsItem: SettingsGroup {
     var title: String { "Notifications" }
     var icon: String? { "bell.badge.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Scheduled") { Text("3 apps").foregroundStyle(.secondary) }
+        SettingsItem("Scheduled", searchable: false) { Text("3 apps").foregroundStyle(.secondary) }
     }
 }
 
@@ -301,7 +306,7 @@ struct SoundsHapticsItem: SettingsGroup {
     var title: String { "Sounds & Haptics" }
     var icon: String? { "speaker.wave.3.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Ringtone") { Text("Reflection").foregroundStyle(.secondary) }
+        SettingsItem("Ringtone", searchable: false) { Text("Reflection").foregroundStyle(.secondary) }
     }
 }
 
@@ -309,7 +314,7 @@ struct FocusItem: SettingsGroup {
     var title: String { "Focus" }
     var icon: String? { "moon.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Active") { Text("None").foregroundStyle(.secondary) }
+        SettingsItem("Active", searchable: false) { Text("None").foregroundStyle(.secondary) }
     }
 }
 
@@ -317,7 +322,7 @@ struct ScreenTimeItem: SettingsGroup {
     var title: String { "Screen Time" }
     var icon: String? { "hourglass" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Usage") { Text("See Report").foregroundStyle(.secondary) }
+        SettingsItem("Usage", searchable: false) { Text("See Report").foregroundStyle(.secondary) }
     }
 }
 
@@ -325,7 +330,7 @@ struct EmergencySOSItem: SettingsGroup {
     var title: String { "Emergency SOS" }
     var icon: String? { "sos" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Settings") { Text("Configure").foregroundStyle(.secondary) }
+        SettingsItem("Settings", searchable: false) { Text("Configure").foregroundStyle(.secondary) }
     }
 }
 
@@ -333,7 +338,7 @@ struct PrivacySecurityItem: SettingsGroup {
     var title: String { "Privacy & Security" }
     var icon: String? { "hand.raised.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Permissions") { Text("Review").foregroundStyle(.secondary) }
+        SettingsItem("Permissions", searchable: false) { Text("Review").foregroundStyle(.secondary) }
     }
 }
 
@@ -341,7 +346,7 @@ struct GameCenterItem: SettingsGroup {
     var title: String { "Game Center" }
     var icon: String? { "gamecontroller.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Profile") { Text("Aether").foregroundStyle(.secondary) }
+        SettingsItem("Profile", searchable: false) { Text("Aether").foregroundStyle(.secondary) }
     }
 }
 
@@ -349,7 +354,7 @@ struct iCloudItem: SettingsGroup {
     var title: String { "iCloud" }
     var icon: String? { "icloud.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Storage") { Text("50 GB").foregroundStyle(.secondary) }
+        SettingsItem("Storage", searchable: false) { Text("50 GB").foregroundStyle(.secondary) }
     }
 }
 
@@ -357,7 +362,7 @@ struct WalletApplePayItem: SettingsGroup {
     var title: String { "Wallet & Apple Pay" }
     var icon: String? { "wallet.pass.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Cards") { Text("2 cards").foregroundStyle(.secondary) }
+        SettingsItem("Cards", searchable: false) { Text("2 cards").foregroundStyle(.secondary) }
     }
 }
 
@@ -365,7 +370,7 @@ struct AppsItem: SettingsGroup {
     var title: String { "Apps" }
     var icon: String? { "square.grid.3x3.fill" }
     var settingsBody: some SettingsContent {
-        SettingsItem("Installed") { Text("120 apps").foregroundStyle(.secondary) }
+        SettingsItem("Installed", searchable: false) { Text("120 apps").foregroundStyle(.secondary) }
     }
 }
 
