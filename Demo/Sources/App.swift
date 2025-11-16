@@ -46,44 +46,45 @@ struct CustomSettingsStyle: SettingsStyle {
 // MARK: - State
 
 // Observable state class that can be shared by reference
-class SettingsState: ObservableObject {
-    @Published var airplaneModeEnabled = false
-    @Published var bluetoothEnabled = true
-    @Published var personalHotspotEnabled = false
-    @Published var vpnQuickEnabled = false
-    @Published var appleIntelligenceEnabled = true
-    @Published var autoBrightness = true
-    @Published var siriSuggestions = true
-    @Published var autoStandby = true
-    @Published var debugMode = false
-    @Published var verboseLogging = false
-    @Published var showHiddenFeatures = false
-    @Published var networkDebugging = false
-    @Published var airDropEnabled = true
-    @Published var pipEnabled = true
-    @Published var autoFillPasswords = true
-    @Published var use24Hour = false
-    @Published var autoCorrect = true
-    @Published var vpnManagementEnabled = false
-    @Published var darkMode = false
-    @Published var autoJoinWiFi = true
+@Observable
+class SettingsState {
+    var airplaneModeEnabled = false
+    var bluetoothEnabled = true
+    var personalHotspotEnabled = false
+    var vpnQuickEnabled = false
+    var appleIntelligenceEnabled = true
+    var autoBrightness = true
+    var siriSuggestions = true
+    var autoStandby = true
+    var debugMode = false
+    var verboseLogging = false
+    var showHiddenFeatures = false
+    var networkDebugging = false
+    var airDropEnabled = true
+    var pipEnabled = true
+    var autoFillPasswords = true
+    var use24Hour = false
+    var autoCorrect = true
+    var vpnManagementEnabled = false
+    var darkMode = false
+    var autoJoinWiFi = true
 }
 
 @main
 struct SettingsKitDemoApp: App {
-    @StateObject private var state = SettingsState()
+    @State private var state = SettingsState()
 
     var body: some Scene {
         WindowGroup {
             SettingsView(DemoSettings(state: state))
-                .settingsStyle(.card)  // Use the default settings style
+                .settingsStyle(.default)  // Use the default settings style
         }
     }
 }
 
 struct DemoSettings: SettingsContainer {
-    @ObservedObject var state: SettingsState
-
+    @Bindable var state: SettingsState
+    
     var settingsBody: some SettingsContent {
         SettingsGroup("Profile", systemImage: "person.crop.circle.fill") {
             SettingsItem("Account Info") {
@@ -96,7 +97,8 @@ struct DemoSettings: SettingsContainer {
                 }
             }
         }
-
+       
+        
         // Quick Settings Sections (inline presentation)
         SettingsGroup("Connections", .inline) {
             SettingsGroup("Airplane Mode", systemImage: "airplane") {
