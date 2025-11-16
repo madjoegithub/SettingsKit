@@ -8,16 +8,20 @@ public protocol SettingsContent: View, Sendable {
     func makeNodes() -> [SettingsNode]
 }
 
-/// A container for settings content, typically the root-level settings view.
-public protocol SettingsContainer: View {
-    associatedtype SettingsBody: SettingsContent
+/// A container view for settings content.
+public struct SettingsContainer<Content: SettingsContent>: View {
+    let content: Content
 
-    @SettingsContentBuilder
-    var settingsBody: SettingsBody { get }
-}
+    public init(@SettingsContentBuilder content: () -> Content) {
+        self.content = content()
+    }
 
-public extension SettingsContainer {
-    var body: some View {
-        settingsBody
+    public var body: some View {
+        SettingsView(content: content)
+    }
+
+    /// Get the node tree for search/navigation
+    func makeNodes() -> [SettingsNode] {
+        content.makeNodes()
     }
 }
