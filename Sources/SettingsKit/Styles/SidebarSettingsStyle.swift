@@ -41,7 +41,7 @@ private struct SidebarContainer: View {
                     configuration.content
                 }
                 .navigationTitle(configuration.title)
-                .searchable(text: searchText, prompt: "Search settings")
+                .searchable(text: searchText, placement: .sidebar, prompt: "Search settings")
             } else {
                 List(selection: $selectedGroup) {
                     configuration.content
@@ -54,7 +54,7 @@ private struct SidebarContainer: View {
                     List {
                         selectedGroup.content
                     }
-                    .listStyle(.sidebar)
+//                    .listStyle(.sidebar)
                     .navigationTitle(selectedGroup.title)
 #if !os(tvOS) && !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
