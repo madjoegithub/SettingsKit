@@ -29,20 +29,13 @@ public struct SidebarSettingsStyle: SettingsStyle {
     }
 }
 
-// Custom navigation link that renders fresh content directly
+// Custom navigation link that uses value-based navigation for proper NavigationSplitView support
 private struct SidebarNavigationLink: View {
     let configuration: SettingsGroupConfiguration
 
     var body: some View {
-        // Always use destination-based navigation for fresh rendering!
-        NavigationLink {
-            NavigationStack {
-                List {
-                    configuration.content
-                }
-                .navigationTitle(configuration.title)
-            }
-        } label: {
+        // Use value-based navigation to work with NavigationSplitView's detail NavigationStack
+        NavigationLink(value: configuration) {
             configuration.label
         }
     }
@@ -50,11 +43,12 @@ private struct SidebarNavigationLink: View {
 
 private struct SidebarContainer: View {
     let configuration: SettingsContainerConfiguration
+    @State private var selectedGroup: SettingsGroupConfiguration?
 
     var body: some View {
         NavigationSplitView {
             if let searchText = configuration.searchText {
-                List {
+                List(selection: $selectedGroup) {
                     configuration.content
                 }
                 .navigationTitle(configuration.title)
@@ -64,14 +58,29 @@ private struct SidebarContainer: View {
                 .searchable(text: searchText, placement: .sidebar, prompt: "Search settings")
 #endif
             } else {
-                List {
+                List(selection: $selectedGroup) {
                     configuration.content
                 }
                 .navigationTitle(configuration.title)
             }
         } detail: {
-            Text("Select a setting")
-                .foregroundStyle(.secondary)
+            NavigationStack(path: configuration.navigationPath) {
+                if let selectedGroup {
+                    List {
+                        selectedGroup.content
+                    }
+                    .navigationTitle(selectedGroup.title)
+                    .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
+                        List {
+                            groupConfig.content
+                        }
+                        .navigationTitle(groupConfig.title)
+                    }
+                } else {
+                    Text("Select a setting")
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
     }
 }
