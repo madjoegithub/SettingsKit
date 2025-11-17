@@ -323,6 +323,83 @@ SettingsItem("Current Status", searchable: false) {
 }
 ```
 
+## How It Works
+
+SettingsKit uses a two-stage architecture to transform your declarative settings into a searchable, navigable interface.
+
+### The Indexing System
+
+When you define settings using `SettingsGroup` and `SettingsItem`, SettingsKit builds an internal **node tree** that represents your entire settings hierarchy. This happens automatically and efficiently:
+
+1. **Declarative Definition** - You write settings using SwiftUI-style syntax
+2. **Node Tree Building** - Each element converts to a `SettingsNode` (group or item)
+3. **Lazy Indexing** - The tree is built on-demand during rendering or searching
+4. **Search & Navigation** - The indexed tree powers both features
+
+#### The Node Tree
+
+Every setting becomes a node in an indexed tree:
+
+```
+SettingsNode Tree:
+├─ Group: "General" (navigation)
+│  ├─ Item: "Notifications"
+│  └─ Item: "Dark Mode"
+├─ Group: "Appearance" (navigation)
+│  └─ Item: "Font Size"
+└─ Group: "Privacy & Security" (navigation)
+   └─ Item: "Auto Lock Delay"
+```
+
+Each node stores:
+- **UUID** - Unique identifier for navigation and identity
+- **Title & Icon** - Display information
+- **Tags** - Additional keywords for search
+- **Presentation Mode** - Navigation link or inline section
+- **Children** - Nested groups and items (for groups)
+
+#### How Search Works
+
+The default search implementation uses intelligent scoring:
+
+1. **Normalization** - Removes spaces, special characters, converts to lowercase
+2. **Scoring** - Ranks matches by relevance:
+   - Exact match: 1000 points
+   - Starts with: 500 points
+   - Contains: 300 points
+   - Tag match: 100 points
+3. **Tree Traversal** - Recursively searches all nodes
+4. **Result Grouping** - Groups matched items by their parent group
+
+This means searching "notif" finds "Notifications", and tags like `["alerts", "sounds"]` make items discoverable through alternative keywords.
+
+#### Navigation Architecture
+
+SettingsKit provides two navigation styles that work with the same indexed tree:
+
+**Sidebar Style (NavigationSplitView)**:
+- Split-view layout with sidebar and detail pane
+- Top-level groups appear in the sidebar
+- Selection-based navigation
+- On macOS: detail pane has its own NavigationStack for nested groups
+- On iOS: uses NavigationSplitView's built-in navigation
+
+**Single Column Style (NavigationStack)**:
+- Push navigation for all groups
+- Linear navigation hierarchy
+- Inline groups render as section headers
+- Search results push onto the navigation stack
+
+The node tree's awareness of **navigation vs. inline presentation** ensures groups render correctly in both styles.
+
+### Why This Design?
+
+- **Performance** - Lazy indexing builds the tree only when needed
+- **Dynamic Content** - Supports conditional settings (if/else, ForEach)
+- **Powerful Search** - Entire hierarchy is searchable with one index
+- **Extensibility** - Custom search and styles work with the same tree
+- **Type Safety** - SwiftUI result builders validate at compile time
+
 ## Platform Differences
 
 ### iOS
