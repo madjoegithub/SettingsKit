@@ -16,7 +16,19 @@ public struct SettingsItem<Content: View>: SettingsContent {
         searchable: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
-        self.id = UUID()
+        // Use a stable ID based on title and icon to ensure consistency across makeNodes() calls
+        var hasher = Hasher()
+        hasher.combine(title)
+        hasher.combine(icon)
+        let hashValue = hasher.finalize()
+        self.id = UUID(uuid: uuid_t(
+            UInt8((hashValue >> 56) & 0xFF), UInt8((hashValue >> 48) & 0xFF),
+            UInt8((hashValue >> 40) & 0xFF), UInt8((hashValue >> 32) & 0xFF),
+            UInt8((hashValue >> 24) & 0xFF), UInt8((hashValue >> 16) & 0xFF),
+            UInt8((hashValue >> 8) & 0xFF),  UInt8(hashValue & 0xFF),
+            0, 0, 0, 0, 0, 0, 0, 0
+        ))
+
         self.title = title
         self.icon = icon
         self.tags = tags
@@ -24,22 +36,42 @@ public struct SettingsItem<Content: View>: SettingsContent {
         self.content = content()
     }
 
+    @Environment(\.searchResultIDs) private var searchResultIDs
+
     public var body: some View {
-        StyledSettingsItem(
-            title: title,
-            icon: icon,
-            content: content
-        )
+        // If search filtering is active, only render if this item matches
+        if let searchIDs = searchResultIDs {
+            let shouldRender = searchIDs.contains(id)
+            if shouldRender {
+                StyledSettingsItem(
+                    title: title,
+                    icon: icon,
+                    content: content
+                )
+            }
+        } else {
+            // No search filtering, render normally
+            StyledSettingsItem(
+                title: title,
+                icon: icon,
+                content: content
+            )
+        }
     }
 
     public func makeNodes() -> [SettingsNode] {
-        [.item(
+        // Register the view builder for this item so search can render it
+        SettingsNodeViewRegistry.shared.register(id: id) { [content] in
+            AnyView(content)
+        }
+
+        return [.item(
             id: id,
             title: title,
             icon: icon,
             tags: tags,
-            searchable: searchable,
-            content: AnyView(content)
+            searchable: searchable
+            // No content - nodes are metadata only
         )]
     }
 

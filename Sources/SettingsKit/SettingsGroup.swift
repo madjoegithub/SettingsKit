@@ -30,7 +30,20 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
         footer: String? = nil,
         @SettingsContentBuilder content: () -> Content
     ) {
-        self.id = UUID()
+        // Use a stable ID based on title and icon to ensure consistency across makeNodes() calls
+        var hasher = Hasher()
+        hasher.combine(title)
+        hasher.combine(systemImage)
+        hasher.combine(presentation)
+        let hashValue = hasher.finalize()
+        self.id = UUID(uuid: uuid_t(
+            UInt8((hashValue >> 56) & 0xFF), UInt8((hashValue >> 48) & 0xFF),
+            UInt8((hashValue >> 40) & 0xFF), UInt8((hashValue >> 32) & 0xFF),
+            UInt8((hashValue >> 24) & 0xFF), UInt8((hashValue >> 16) & 0xFF),
+            UInt8((hashValue >> 8) & 0xFF),  UInt8(hashValue & 0xFF),
+            0, 0, 0, 0, 0, 0, 0, 0
+        ))
+
         self.title = title
         self.icon = systemImage
         self.footer = footer
@@ -40,24 +53,48 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
     }
 
     @Environment(\.settingsStyle) private var style
+    @Environment(\.searchResultIDs) private var searchResultIDs
 
     public var body: some View {
         let children = content.makeNodes()
 
-        return style.makeGroup(
-            configuration: SettingsGroupConfiguration(
-                title: title,
-                icon: icon,
-                footer: footer,
-                presentation: presentation,
-                content: AnyView(content.body),
-                children: children
+        // If search filtering is active, only render if this group or its children match
+        if let searchIDs = searchResultIDs {
+            let shouldRender = searchIDs.contains(id) || children.contains(where: { searchIDs.contains($0.id) })
+            if shouldRender {
+                style.makeGroup(
+                    configuration: SettingsGroupConfiguration(
+                        title: title,
+                        icon: icon,
+                        footer: footer,
+                        presentation: presentation,
+                        content: AnyView(content.body),
+                        children: children
+                    )
+                )
+            }
+        } else {
+            // No search filtering, render normally
+            style.makeGroup(
+                configuration: SettingsGroupConfiguration(
+                    title: title,
+                    icon: icon,
+                    footer: footer,
+                    presentation: presentation,
+                    content: AnyView(content.body),
+                    children: children
+                )
             )
-        )
+        }
     }
 
     public func makeNodes() -> [SettingsNode] {
         let children = content.makeNodes()
+
+        // Register the view builder for this group so search/navigation can render it
+        SettingsNodeViewRegistry.shared.register(id: id) { [content] in
+            AnyView(content.body)
+        }
 
         return [.group(
             id: id,
