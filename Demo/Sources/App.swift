@@ -72,21 +72,24 @@ class SettingsState {
 
 @main
 struct SettingsKitDemoApp: App {
-    @State private var state = SettingsState()
+    @State private var settings = SettingsState()
     @State private var stressTest = StressTestSettings()
     
     var body: some Scene {
         WindowGroup {
-            DemoSettings(state: state)
+            DemoSettings()
+                .environment(settings)
 //            StressTestSettingsContainer(settings: stressTest)
         }
     }
 }
 
 struct DemoSettings: SettingsContainer {
-    @Bindable var state: SettingsState
+    @Environment(SettingsState.self) var settings
 
     var settingsBody: some SettingsContent {
+        @Bindable var state = settings
+        Text("\(settings.airplaneModeEnabled)")
             SettingsGroup("Profile", systemImage: "person.crop.circle.fill") {
                 SettingsItem("Account Info") {
                     VStack(alignment: .leading) {
@@ -98,8 +101,7 @@ struct DemoSettings: SettingsContainer {
                     }
                 }
             }
-            
-            
+
             // Quick Settings Sections (inline presentation)
             SettingsGroup("Connections", .inline) {
                 SettingsGroup("Airplane Mode", systemImage: "airplane") {

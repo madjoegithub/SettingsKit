@@ -50,7 +50,7 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
                 icon: icon,
                 footer: footer,
                 presentation: presentation,
-                content: AnyView(content),
+                content: AnyView(content.body),
                 children: children
             )
         )

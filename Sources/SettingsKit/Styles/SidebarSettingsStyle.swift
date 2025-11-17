@@ -11,9 +11,8 @@ public struct SidebarSettingsStyle: SettingsStyle {
     public func makeGroup(configuration: GroupConfiguration) -> some View {
         switch configuration.presentation {
         case .navigation:
-            NavigationLink(value: configuration) {
-                configuration.label
-            }
+            // For sidebar, we'll use a custom approach to ensure fresh rendering
+            SidebarNavigationLink(configuration: configuration)
         case .inline:
             Section {
                 configuration.content
@@ -30,49 +29,50 @@ public struct SidebarSettingsStyle: SettingsStyle {
     }
 }
 
+// Custom navigation link that renders fresh content directly
+private struct SidebarNavigationLink: View {
+    let configuration: SettingsGroupConfiguration
+
+    var body: some View {
+        // Always use destination-based navigation for fresh rendering!
+        // Each destination renders the fresh content
+        NavigationLink {
+            // Wrap in NavigationStack to support further nesting
+            NavigationStack {
+                List {
+                    configuration.content
+                }
+                .navigationTitle(configuration.title)
+#if !os(tvOS) && !os(macOS)
+                .navigationBarTitleDisplayMode(.inline)
+#endif
+            }
+        } label: {
+            configuration.label
+        }
+    }
+}
+
 private struct SidebarContainer: View {
     let configuration: SettingsContainerConfiguration
-    @State private var selectedGroup: SettingsGroupConfiguration?
-    
+
     var body: some View {
         NavigationSplitView {
             if let searchText = configuration.searchText {
-                List(selection: $selectedGroup) {
+                List {
                     configuration.content
                 }
                 .navigationTitle(configuration.title)
                 .searchable(text: searchText, placement: .sidebar, prompt: "Search settings")
             } else {
-                List(selection: $selectedGroup) {
+                List {
                     configuration.content
                 }
                 .navigationTitle(configuration.title)
             }
         } detail: {
-            if let selectedGroup {
-                NavigationStack(path: configuration.navigationPath) {
-                    List {
-                        selectedGroup.content
-                    }
-//                    .listStyle(.sidebar)
-                    .navigationTitle(selectedGroup.title)
-#if !os(tvOS) && !os(macOS)
-                    .navigationBarTitleDisplayMode(.inline)
-#endif
-                    .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
-                        List {
-                            groupConfig.content
-                        }
-                        .navigationTitle(groupConfig.title)
-#if !os(tvOS) && !os(macOS)
-                        .navigationBarTitleDisplayMode(.inline)
-#endif
-                    }
-                }
-            } else {
-                Text("Select a setting")
-                    .foregroundStyle(.secondary)
-            }
+            Text("Select a setting")
+                .foregroundStyle(.secondary)
         }
     }
 }
