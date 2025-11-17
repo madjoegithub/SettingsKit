@@ -36,22 +36,12 @@ private struct SidebarNavigationLink: View {
     var body: some View {
         // Always use destination-based navigation for fresh rendering!
         NavigationLink {
-#if os(macOS)
-            // On macOS: wrap in NavigationStack for nested navigation
             NavigationStack {
                 List {
                     configuration.content
                 }
                 .navigationTitle(configuration.title)
             }
-#else
-            // On iOS: let NavigationSplitView handle navigation
-            List {
-                configuration.content
-            }
-            .navigationTitle(configuration.title)
-            .navigationBarTitleDisplayMode(.inline)
-#endif
         } label: {
             configuration.label
         }
