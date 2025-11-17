@@ -33,6 +33,14 @@ public struct SingleColumnSettingsStyle: @preconcurrency SettingsStyle {
                 .navigationBarTitleDisplayMode(.inline)
 #endif
             }
+            .navigationDestination(for: SettingsCustomGroupConfiguration.self) { customGroupConfig in
+                // Custom group: show raw content without List wrapper
+                customGroupConfig.content
+                    .navigationTitle(customGroupConfig.title)
+#if !os(tvOS) && !os(macOS)
+                    .navigationBarTitleDisplayMode(.inline)
+#endif
+            }
         }
     }
 
@@ -53,6 +61,13 @@ public struct SingleColumnSettingsStyle: @preconcurrency SettingsStyle {
                     Text(footer)
                 }
             }
+        }
+    }
+
+    @MainActor
+    public func makeCustomGroup(configuration: CustomGroupConfiguration) -> some View {
+        NavigationLink(value: configuration) {
+            configuration.label
         }
     }
 
