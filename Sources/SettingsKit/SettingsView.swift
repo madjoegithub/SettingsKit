@@ -105,8 +105,14 @@ struct SearchResultItem: View {
                 SearchResultItem(node: child)
             }
 
-        case .item(_, _, _, _, _, let content):
-            content
+        case .item(_, let title, let icon, _, _):
+            // TODO: Render from original source, not from node
+            // For now, just show metadata
+            if let icon = icon {
+                Label(title, systemImage: icon)
+            } else {
+                Text(title)
+            }
         }
     }
 }
@@ -151,9 +157,19 @@ struct NodeView: View {
                 )
             )
 
-        case .item(_, _, _, _, _, let content):
-            // For items, render the actual content
-            content
+        case .item(_, let title, let icon, _, _):
+            // TODO: Should not render from nodes at all!
+            // This is a temporary placeholder
+            style.makeItem(
+                configuration: SettingsItemConfiguration(
+                    title: title,
+                    icon: icon,
+                    content: AnyView(
+                        Text("Item: \(title)")
+                            .foregroundStyle(.secondary)
+                    )
+                )
+            )
         }
     }
 }
