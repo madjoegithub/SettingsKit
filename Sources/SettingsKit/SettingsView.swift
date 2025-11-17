@@ -38,6 +38,12 @@ public struct SettingsView<Container: SettingsContainer>: View {
             ForEach(searchResults) { result in
                 SearchResultSection(container: container, result: result, navigationPath: $navigationPath)
             }
+            .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
+                List {
+                    groupConfig.content
+                }
+                .navigationTitle(groupConfig.title)
+            }
         }
     }
 
