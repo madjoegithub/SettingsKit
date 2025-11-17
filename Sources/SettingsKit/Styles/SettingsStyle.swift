@@ -94,6 +94,9 @@ public struct SettingsGroupConfiguration: @unchecked Sendable, Hashable {
     /// The content of the group.
     public let content: AnyView
 
+    /// The child nodes of this group (for search purposes).
+    public let children: [SettingsNode]
+
     /// Internal ID for hashing
     private let id = UUID()
 

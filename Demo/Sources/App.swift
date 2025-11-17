@@ -73,10 +73,12 @@ class SettingsState {
 @main
 struct SettingsKitDemoApp: App {
     @State private var state = SettingsState()
+    @State private var stressTest = StressTestSettings()
     
     var body: some Scene {
         WindowGroup {
             DemoSettings(state: state)
+//            StressTestSettingsContainer(settings: stressTest)
         }
     }
 }

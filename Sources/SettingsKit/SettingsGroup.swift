@@ -42,13 +42,16 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
     @Environment(\.settingsStyle) private var style
 
     public var body: some View {
-        style.makeGroup(
+        let children = content.makeNodes()
+
+        return style.makeGroup(
             configuration: SettingsGroupConfiguration(
                 title: title,
                 icon: icon,
                 footer: footer,
                 presentation: presentation,
-                content: AnyView(content)
+                content: AnyView(content),
+                children: children
             )
         )
     }

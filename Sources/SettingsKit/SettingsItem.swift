@@ -42,6 +42,17 @@ public struct SettingsItem<Content: View>: SettingsContent {
             content: AnyView(content)
         )]
     }
+
+    /// Adds search tags to this item.
+    public func settingsTags(_ tags: [String]) -> Self {
+        SettingsItem(
+            title,
+            icon: icon,
+            tags: tags,
+            searchable: searchable,
+            content: { content }
+        )
+    }
 }
 
 // MARK: - Styled Item View

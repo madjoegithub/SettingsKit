@@ -61,7 +61,7 @@ struct SearchResultSection: View {
             Group {
                 if result.isNavigation {
                     // Navigation result: show as a single tappable row
-                    NavigationLink(value: result.group) {
+                    NavigationLink(value: result.group.asGroupConfiguration()) {
                         Label(title, systemImage: icon ?? "folder")
                     }
                 } else {
@@ -71,9 +71,7 @@ struct SearchResultSection: View {
                             SearchResultItem(node: item)
                         }
                     } header: {
-                        Button {
-                            navigationPath.append(result.group)
-                        } label: {
+                        NavigationLink(value: result.group.asGroupConfiguration()) {
                             HStack {
                                 if let icon = icon {
                                     Image(systemName: icon)
@@ -132,14 +130,26 @@ struct SettingsNodeDetailView: View {
 /// Internal view for rendering a single node (group or item)
 struct NodeView: View {
     let node: SettingsNode
+    @Environment(\.settingsStyle) private var style
 
     var body: some View {
         switch node {
-        case .group(_, let title, let icon, _, _, _):
-            // For groups, create a navigation link
-            NavigationLink(value: node) {
-                Label(title, systemImage: icon ?? "folder")
-            }
+        case .group(_, let title, let icon, let tags, let presentation, let children):
+            // Render group using the style system to respect inline/navigation presentation
+            style.makeGroup(
+                configuration: SettingsGroupConfiguration(
+                    title: title,
+                    icon: icon,
+                    footer: nil,
+                    presentation: presentation,
+                    content: AnyView(
+                        ForEach(children) { child in
+                            NodeView(node: child)
+                        }
+                    ),
+                    children: children
+                )
+            )
 
         case .item(_, _, _, _, _, let content):
             // For items, render the actual content

@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2DA37F5D2ECB37CC00F84944 /* StressTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA37F5C2ECB37CC00F84944 /* StressTest.swift */; };
 		DFA8673A0677C29373B338A4 /* SettingsKit in Frameworks */ = {isa = PBXBuildFile; productRef = A3312EA1728BA1C83C1377EF /* SettingsKit */; };
 		FCBEC4C69CB3FB5ACAEFAE05 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF17B927F86D4A44BDDD4858 /* App.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1E4CBF1BBD860C0B17DAC096 /* SettingsKitDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SettingsKitDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DA37F5C2ECB37CC00F84944 /* StressTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StressTest.swift; sourceTree = "<group>"; };
 		B41B1556826471979A14DC9B /* SettingsKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SettingsKit; path = ..; sourceTree = SOURCE_ROOT; };
 		FF17B927F86D4A44BDDD4858 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,6 +60,7 @@
 			isa = PBXGroup;
 			children = (
 				FF17B927F86D4A44BDDD4858 /* App.swift */,
+				2DA37F5C2ECB37CC00F84944 /* StressTest.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -120,6 +123,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCBEC4C69CB3FB5ACAEFAE05 /* App.swift in Sources */,
+				2DA37F5D2ECB37CC00F84944 /* StressTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

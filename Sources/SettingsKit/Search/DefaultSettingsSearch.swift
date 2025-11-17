@@ -5,9 +5,11 @@ public struct DefaultSettingsSearch: SettingsSearch {
     public init() {}
 
     public func search(nodes: [SettingsNode], query: String) -> [SettingsSearchResult] {
+        print("🔍 Search called with query: '\(query)', nodes count: \(nodes.count)")
         var results: [SettingsSearchResult] = []
         var orderIndex = 0
         searchNodes(nodes, query: query.lowercased(), results: &results, orderIndex: &orderIndex)
+        print("🔍 Search found \(results.count) results")
 
         // Deduplicate by group ID (keep the one with higher score)
         var seenIDs: [UUID: SettingsSearchResult] = [:]
@@ -100,6 +102,10 @@ public struct DefaultSettingsSearch: SettingsSearch {
                                   tags.contains(where: { $0.lowercased().contains(query) })
 
                 let isLeafGroup = children.allSatisfy { !$0.isGroup }
+
+                if groupMatches {
+                    print("🔍 Group '\(title)' matches query '\(query)' - isLeaf: \(isLeafGroup), presentation: \(presentation)")
+                }
 
                 if isLeafGroup {
                     // Leaf group: check if group or any searchable children match

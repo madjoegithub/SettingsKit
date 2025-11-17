@@ -97,4 +97,25 @@ public enum SettingsNode: Identifiable, Hashable, @unchecked Sendable {
     public static func == (lhs: SettingsNode, rhs: SettingsNode) -> Bool {
         lhs.id == rhs.id
     }
+
+    /// Converts this node to a SettingsGroupConfiguration for navigation.
+    /// Only works for group nodes.
+    public func asGroupConfiguration() -> SettingsGroupConfiguration {
+        guard case .group(_, let title, let icon, _, let presentation, let children) = self else {
+            fatalError("asGroupConfiguration() can only be called on group nodes")
+        }
+
+        return SettingsGroupConfiguration(
+            title: title,
+            icon: icon,
+            footer: nil,
+            presentation: presentation,
+            content: AnyView(
+                ForEach(children) { child in
+                    NodeView(node: child)
+                }
+            ),
+            children: children
+        )
+    }
 }
