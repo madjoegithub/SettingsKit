@@ -6,6 +6,7 @@ public struct SettingsView<Container: SettingsContainer>: View {
     @State private var searchText = ""
     @State private var navigationPath = NavigationPath()
     @Environment(\.settingsStyle) private var style
+    @Environment(\.settingsSearch) private var search
 
     public init(container: Container) {
         self.container = container
@@ -46,7 +47,8 @@ public struct SettingsView<Container: SettingsContainer>: View {
         let allNodes = container.settingsBody.makeNodes()
 
         var results: [SearchResult] = []
-        searchNodes(allNodes, query: searchText.lowercased(), results: &results)
+        var orderIndex = 0
+        searchNodes(allNodes, query: searchText.lowercased(), results: &results, orderIndex: &orderIndex)
 
         // Deduplicate by group ID (keep the one with higher score)
         var seenIDs: [UUID: SearchResult] = [:]
@@ -66,10 +68,18 @@ public struct SettingsView<Container: SettingsContainer>: View {
 
         let uniqueResults = Array(seenIDs.values)
 
-        // Sort results by match quality
+        // Sort results by match quality, then by original order, then alphabetically
         let sortedResults = uniqueResults.sorted { lhs, rhs in
             let lhsScore = matchScore(for: lhs.group, query: searchText.lowercased())
             let rhsScore = matchScore(for: rhs.group, query: searchText.lowercased())
+            if lhsScore == rhsScore {
+                // Same score: preserve original order
+                if lhs.orderIndex == rhs.orderIndex {
+                    // Same position (shouldn't happen): sort alphabetically
+                    return lhs.group.title < rhs.group.title
+                }
+                return lhs.orderIndex < rhs.orderIndex
+            }
             return lhsScore > rhsScore
         }
 
@@ -131,8 +141,11 @@ public struct SettingsView<Container: SettingsContainer>: View {
         return 0
     }
 
-    func searchNodes(_ nodes: [SettingsNode], query: String, results: inout [SearchResult]) {
+    func searchNodes(_ nodes: [SettingsNode], query: String, results: inout [SearchResult], orderIndex: inout Int) {
         for node in nodes {
+            let currentIndex = orderIndex
+            orderIndex += 1
+
             switch node {
             case .group(let id, let title, let icon, let tags, let presentation, let children):
                 let groupMatches = title.lowercased().contains(query) ||
@@ -153,7 +166,7 @@ public struct SettingsView<Container: SettingsContainer>: View {
                     // Only add navigation groups as leaf results, skip inline groups
                     if presentation == .navigation && (groupMatches || childMatches) {
                         print("  -> Adding as LEAF group")
-                        results.append(SearchResult(group: node, matchedItems: children, isNavigation: false))
+                        results.append(SearchResult(group: node, matchedItems: children, isNavigation: false, orderIndex: currentIndex))
                     }
                 } else {
                     // Parent group
@@ -161,10 +174,13 @@ public struct SettingsView<Container: SettingsContainer>: View {
                         if presentation == .navigation {
                             // Navigation group that matches: add it as a navigation result
                             print("  -> Adding as NAVIGATION group")
-                            results.append(SearchResult(group: node, matchedItems: [], isNavigation: true))
+                            results.append(SearchResult(group: node, matchedItems: [], isNavigation: true, orderIndex: currentIndex))
 
                             // Add all immediate navigation children as separate results
                             for child in children {
+                                let childIndex = orderIndex
+                                orderIndex += 1
+
                                 if case .group(_, _, _, _, let childPresentation, let grandchildren) = child {
                                     // Skip inline child groups
                                     guard childPresentation == .navigation else { continue }
@@ -172,11 +188,11 @@ public struct SettingsView<Container: SettingsContainer>: View {
                                     let isLeafChild = grandchildren.allSatisfy { !$0.isGroup }
                                     if isLeafChild {
                                         print("  -> Also adding child '\(child.title)' as LEAF group")
-                                        results.append(SearchResult(group: child, matchedItems: grandchildren, isNavigation: false))
+                                        results.append(SearchResult(group: child, matchedItems: grandchildren, isNavigation: false, orderIndex: childIndex))
                                     } else {
                                         // Also add navigation children
                                         print("  -> Also adding child '\(child.title)' as NAVIGATION group")
-                                        results.append(SearchResult(group: child, matchedItems: [], isNavigation: true))
+                                        results.append(SearchResult(group: child, matchedItems: [], isNavigation: true, orderIndex: childIndex))
                                     }
                                 }
                             }
@@ -184,6 +200,9 @@ public struct SettingsView<Container: SettingsContainer>: View {
                             // Inline group that matches: add all its navigation children as results
                             print("  -> Inline group matches, adding navigation children")
                             for child in children {
+                                let childIndex = orderIndex
+                                orderIndex += 1
+
                                 if case .group(_, _, _, _, let childPresentation, let grandchildren) = child {
                                     // Only add navigation child groups
                                     guard childPresentation == .navigation else { continue }
@@ -191,17 +210,17 @@ public struct SettingsView<Container: SettingsContainer>: View {
                                     let isLeafChild = grandchildren.allSatisfy { !$0.isGroup }
                                     if isLeafChild {
                                         print("  -> Adding child '\(child.title)' as LEAF group")
-                                        results.append(SearchResult(group: child, matchedItems: grandchildren, isNavigation: false))
+                                        results.append(SearchResult(group: child, matchedItems: grandchildren, isNavigation: false, orderIndex: childIndex))
                                     } else {
                                         print("  -> Adding child '\(child.title)' as NAVIGATION group")
-                                        results.append(SearchResult(group: child, matchedItems: [], isNavigation: true))
+                                        results.append(SearchResult(group: child, matchedItems: [], isNavigation: true, orderIndex: childIndex))
                                     }
                                 }
                             }
                         }
                     }
                     // Always recurse into children to find deeper matches
-                    searchNodes(children, query: query, results: &results)
+                    searchNodes(children, query: query, results: &results, orderIndex: &orderIndex)
                 }
 
             case .item:
@@ -218,6 +237,7 @@ struct SearchResult: Identifiable {
     let group: SettingsNode
     let matchedItems: [SettingsNode]
     let isNavigation: Bool // true = show as nav link, false = show items inline
+    let orderIndex: Int // Original order in the tree for stable sorting
 }
 
 /// Renders a search result section with tappable header
