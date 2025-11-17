@@ -34,7 +34,10 @@ Add SettingsKit to your project through Xcode:
 
 1. File → Add Package Dependencies
 2. Enter the repository URL
-3. Select the version you want to use
+```
+https://github.com/aeastr/SettingsKit.git
+```
+4. Select the version you want to use
 
 Or add it to your `Package.swift`:
 
