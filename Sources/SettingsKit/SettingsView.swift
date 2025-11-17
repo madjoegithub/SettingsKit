@@ -141,10 +141,22 @@ struct SearchResultSection<Container: SettingsContainer>: View {
                 // Navigation result: show as a single tappable row
                 NavigationLink {
                     let config = result.group.asGroupConfiguration()
+#if os(macOS)
+                    // On macOS: wrap in NavigationStack for nested navigation
+                    NavigationStack {
+                        List {
+                            config.content
+                        }
+                        .navigationTitle(config.title)
+                    }
+#else
+                    // On iOS: let NavigationSplitView handle navigation
                     List {
                         config.content
                     }
                     .navigationTitle(config.title)
+                    .navigationBarTitleDisplayMode(.inline)
+#endif
                 } label: {
                     Label(title, systemImage: icon ?? "folder")
                 }
@@ -167,10 +179,22 @@ struct SearchResultSection<Container: SettingsContainer>: View {
                 } header: {
                     NavigationLink {
                         let config = result.group.asGroupConfiguration()
+#if os(macOS)
+                        // On macOS: wrap in NavigationStack for nested navigation
+                        NavigationStack {
+                            List {
+                                config.content
+                            }
+                            .navigationTitle(config.title)
+                        }
+#else
+                        // On iOS: let NavigationSplitView handle navigation
                         List {
                             config.content
                         }
                         .navigationTitle(config.title)
+                        .navigationBarTitleDisplayMode(.inline)
+#endif
                     } label: {
                         HStack {
                             if let icon = icon {
