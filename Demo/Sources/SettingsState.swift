@@ -22,4 +22,12 @@ class SettingsState {
     var vpnManagementEnabled = false
     var darkMode = false
     var autoJoinWiFi = true
+
+    // Test input state
+    var testToggle = false
+    var testSlider = 0.5
+    var testText = ""
+    var testPicker = 0
+    var testStepper = 0
+    var testCounter = 0
 }
