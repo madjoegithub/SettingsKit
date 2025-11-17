@@ -68,7 +68,11 @@ private struct SidebarContainer: View {
                     configuration.content
                 }
                 .navigationTitle(configuration.title)
+#if os(watchOS)
+                .searchable(text: searchText, prompt: "Search settings")
+#else
                 .searchable(text: searchText, placement: .sidebar, prompt: "Search settings")
+#endif
             } else {
                 List {
                     configuration.content
