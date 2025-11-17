@@ -1,5 +1,18 @@
 import SwiftUI
 
+// MARK: - Presentation
+
+/// The presentation mode for a settings group.
+public enum SettingsGroupPresentation: Sendable {
+    /// Display the group as a navigation link that navigates to a detail view.
+    case navigation
+
+    /// Display the group inline as a section.
+    case inline
+}
+
+// MARK: - Group
+
 /// A group of settings that can contain both items and nested groups.
 public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
     let id: UUID

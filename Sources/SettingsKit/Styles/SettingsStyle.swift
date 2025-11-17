@@ -158,6 +158,7 @@ public struct DefaultSettingsStyle: SettingsStyle {
                         configuration.content
                     }
                     .navigationTitle(configuration.title)
+                    .navigationBarTitleDisplayMode(.inline)
                 }
             }
             .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
@@ -165,6 +166,7 @@ public struct DefaultSettingsStyle: SettingsStyle {
                     groupConfig.content
                 }
                 .navigationTitle(groupConfig.title)
+                .navigationBarTitleDisplayMode(.inline)
             }
         }
     }
@@ -248,11 +250,13 @@ private struct SidebarContainer: View {
                         selectedGroup.content
                     }
                     .navigationTitle(selectedGroup.title)
+                    .navigationBarTitleDisplayMode(.inline)
                     .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
                         List {
                             groupConfig.content
                         }
                         .navigationTitle(groupConfig.title)
+                        .navigationBarTitleDisplayMode(.inline)
                     }
                 }
             } else {
