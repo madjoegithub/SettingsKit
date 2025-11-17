@@ -34,8 +34,9 @@ public struct SettingsView<Container: SettingsContainer>: View {
                 description: Text("Check the spelling or try a different search")
             )
         } else {
+            // Show search results as a flat list with actual content
             ForEach(searchResults) { result in
-                SearchResultSection(result: result, navigationPath: $navigationPath)
+                SearchResultSection(container: container, result: result, navigationPath: $navigationPath)
             }
         }
     }
@@ -51,46 +52,128 @@ public struct SettingsView<Container: SettingsContainer>: View {
     }
 }
 
-/// Renders a search result section with tappable header
-struct SearchResultSection: View {
+/// Renders search results by filtering the actual view hierarchy
+struct SearchResultsView<Container: SettingsContainer>: View {
+    let container: Container
+    let results: [SettingsSearchResult]
+    @Binding var navigationPath: NavigationPath
+    @Environment(\.settingsStyle) private var style
+
+    var body: some View {
+        let _ = print("🔍 SearchResultsView: rendering with \(matchedIDs.count) matched IDs: \(matchedIDs)")
+        // Render the full container body with search filtering applied via environment
+        return container.settingsBody
+            .environment(\.searchResultIDs, matchedIDs)
+    }
+
+    private var matchedIDs: Set<UUID> {
+        // Build parent map from all nodes
+        let allNodes = container.settingsBody.makeNodes()
+        var parentMap: [UUID: UUID] = [:]
+        buildParentMap(nodes: allNodes, parentMap: &parentMap)
+
+        var ids = Set<UUID>()
+        for result in results {
+            // Add the matched group
+            ids.insert(result.group.id)
+            // Add all matched items
+            for item in result.matchedItems {
+                ids.insert(item.id)
+            }
+            // Add all children of the group
+            addAllChildren(of: result.group, to: &ids)
+            // Add all parents up to root
+            addAllParents(of: result.group.id, parentMap: parentMap, to: &ids)
+        }
+        return ids
+    }
+
+    private func buildParentMap(nodes: [SettingsNode], parentMap: inout [UUID: UUID], parent: UUID? = nil) {
+        for node in nodes {
+            if let parent = parent {
+                parentMap[node.id] = parent
+            }
+            if let children = node.children {
+                buildParentMap(nodes: children, parentMap: &parentMap, parent: node.id)
+            }
+        }
+    }
+
+    private func addAllChildren(of node: SettingsNode, to ids: inout Set<UUID>) {
+        if let children = node.children {
+            for child in children {
+                ids.insert(child.id)
+                addAllChildren(of: child, to: &ids)
+            }
+        }
+    }
+
+    private func addAllParents(of id: UUID, parentMap: [UUID: UUID], to ids: inout Set<UUID>) {
+        var currentID = id
+        while let parentID = parentMap[currentID] {
+            ids.insert(parentID)
+            currentID = parentID
+        }
+    }
+}
+
+// Environment key for filtering content based on search results
+private struct SearchResultIDsKey: EnvironmentKey {
+    static let defaultValue: Set<UUID>? = nil
+}
+
+extension EnvironmentValues {
+    var searchResultIDs: Set<UUID>? {
+        get { self[SearchResultIDsKey.self] }
+        set { self[SearchResultIDsKey.self] = newValue }
+    }
+}
+
+/// Renders a search result section with actual content from the view hierarchy
+struct SearchResultSection<Container: SettingsContainer>: View {
+    let container: Container
     let result: SettingsSearchResult
     @Binding var navigationPath: NavigationPath
 
     var body: some View {
-        if case .group(_, let title, let icon, _, _, let children) = result.group {
-            Group {
-                if result.isNavigation {
-                    // Navigation result: show as a single tappable row
+        if case .group(_, let title, let icon, _, _, _) = result.group {
+            if result.isNavigation {
+                // Navigation result: show as a single tappable row
+                NavigationLink(value: result.group.asGroupConfiguration()) {
+                    Label(title, systemImage: icon ?? "folder")
+                }
+            } else {
+                // Leaf group result: show as section with actual items from view hierarchy
+                Section {
+                    // Render the container body filtered to show only items in this result
+                    container.settingsBody
+                        .environment(\.searchResultIDs, matchedIDs)
+                } header: {
                     NavigationLink(value: result.group.asGroupConfiguration()) {
-                        Label(title, systemImage: icon ?? "folder")
-                    }
-                } else {
-                    // Leaf group result: show as section with items
-                    Section {
-                        ForEach(result.matchedItems) { item in
-                            SearchResultItem(node: item)
-                        }
-                    } header: {
-                        NavigationLink(value: result.group.asGroupConfiguration()) {
-                            HStack {
-                                if let icon = icon {
-                                    Image(systemName: icon)
-                                }
-                                Text(title)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                        HStack {
+                            if let icon = icon {
+                                Image(systemName: icon)
                             }
+                            Text(title)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
                         }
-                        .buttonStyle(.plain)
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .onAppear {
-                print("Rendering '\(title)': isNav=\(result.isNavigation), items=\(result.matchedItems.count)")
-            }
         }
+    }
+
+    private var matchedIDs: Set<UUID> {
+        var ids = Set<UUID>()
+        // Only include items from this specific result
+        for item in result.matchedItems {
+            ids.insert(item.id)
+        }
+        return ids
     }
 }
 
@@ -100,14 +183,29 @@ struct SearchResultItem: View {
 
     var body: some View {
         switch node {
-        case .group(_, _, _, _, _, let children):
-            ForEach(children) { child in
-                SearchResultItem(node: child)
+        case .group(_, let title, let icon, _, let presentation, let children):
+            // For inline groups in search, show them as sections
+            if presentation == .inline {
+                Section {
+                    ForEach(children) { child in
+                        SearchResultItem(node: child)
+                    }
+                } header: {
+                    if let icon = icon {
+                        Label(title, systemImage: icon)
+                    } else {
+                        Text(title)
+                    }
+                }
+            } else {
+                // Navigation groups: render children recursively
+                ForEach(children) { child in
+                    SearchResultItem(node: child)
+                }
             }
 
         case .item(_, let title, let icon, _, _):
-            // TODO: Render from original source, not from node
-            // For now, just show metadata
+            // Items: just show title/icon (can't render actual content from node on this branch)
             if let icon = icon {
                 Label(title, systemImage: icon)
             } else {

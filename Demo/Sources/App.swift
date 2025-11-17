@@ -98,13 +98,6 @@ struct DemoSettings: SettingsContainer {
     var settingsBody: some SettingsContent {
         @Bindable var state = settings
 
-        Text("Toggle: \(state.testToggle ? "ON" : "OFF")")
-        Text("Slider: \(Int(state.testSlider * 100))%")
-        Text("Text: \(state.testText)")
-        Text("Picker: \(state.testPicker)")
-        Text("Stepper: \(state.testStepper)")
-        Text("Counter: \(state.testCounter)")
-
         SettingsGroup("Input Testing", systemImage: "wrench.and.screwdriver") {
             SettingsItem("Toggle Test") {
                 Toggle("Test Toggle", isOn: $state.testToggle)
