@@ -3,7 +3,7 @@ import SwiftUI
 /// A single-column settings style with standard navigation and list appearance.
 public struct SingleColumnSettingsStyle: SettingsStyle {
     public init() {}
-
+    
     public func makeContainer(configuration: ContainerConfiguration) -> some View {
         NavigationStack(path: configuration.navigationPath) {
             Group {
@@ -18,9 +18,9 @@ public struct SingleColumnSettingsStyle: SettingsStyle {
                         configuration.content
                     }
                     .navigationTitle(configuration.title)
-                    #if !os(tvOS)
+#if !os(tvOS) && !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
-                    #endif
+#endif
                 }
             }
             .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
@@ -28,13 +28,13 @@ public struct SingleColumnSettingsStyle: SettingsStyle {
                     groupConfig.content
                 }
                 .navigationTitle(groupConfig.title)
-                #if !os(tvOS)
+#if !os(tvOS) && !os(macOS)
                 .navigationBarTitleDisplayMode(.inline)
-                #endif
+#endif
             }
         }
     }
-
+    
     public func makeGroup(configuration: GroupConfiguration) -> some View {
         switch configuration.presentation {
         case .navigation:
@@ -53,7 +53,7 @@ public struct SingleColumnSettingsStyle: SettingsStyle {
             }
         }
     }
-
+    
     public func makeItem(configuration: ItemConfiguration) -> some View {
         configuration.content
     }

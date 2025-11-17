@@ -3,11 +3,11 @@ import SwiftUI
 /// A settings style using a split view with sidebar navigation.
 public struct SidebarSettingsStyle: SettingsStyle {
     public init() {}
-
+    
     public func makeContainer(configuration: ContainerConfiguration) -> some View {
         SidebarContainer(configuration: configuration)
     }
-
+    
     public func makeGroup(configuration: GroupConfiguration) -> some View {
         switch configuration.presentation {
         case .navigation:
@@ -24,7 +24,7 @@ public struct SidebarSettingsStyle: SettingsStyle {
             }
         }
     }
-
+    
     public func makeItem(configuration: ItemConfiguration) -> some View {
         configuration.content
     }
@@ -33,7 +33,7 @@ public struct SidebarSettingsStyle: SettingsStyle {
 private struct SidebarContainer: View {
     let configuration: SettingsContainerConfiguration
     @State private var selectedGroup: SettingsGroupConfiguration?
-
+    
     var body: some View {
         NavigationSplitView {
             if let searchText = configuration.searchText {
@@ -54,18 +54,19 @@ private struct SidebarContainer: View {
                     List {
                         selectedGroup.content
                     }
+                    .listStyle(.sidebar)
                     .navigationTitle(selectedGroup.title)
-                    #if !os(tvOS)
+#if !os(tvOS) && !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
-                    #endif
+#endif
                     .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
                         List {
                             groupConfig.content
                         }
                         .navigationTitle(groupConfig.title)
-                        #if !os(tvOS)
+#if !os(tvOS) && !os(macOS)
                         .navigationBarTitleDisplayMode(.inline)
-                        #endif
+#endif
                     }
                 }
             } else {
