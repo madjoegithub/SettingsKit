@@ -50,6 +50,7 @@ public struct SettingsView<Container: SettingsContainer>: View {
         // Use the search implementation from environment
         return search.search(nodes: allNodes, query: searchText)
     }
+    
 }
 
 /// Renders search results by filtering the actual view hierarchy
@@ -143,11 +144,16 @@ struct SearchResultSection<Container: SettingsContainer>: View {
                     Label(title, systemImage: icon ?? "folder")
                 }
             } else {
-                // Leaf group result: show as section with actual items from view hierarchy
+                // Leaf group result: show as section with items rendered directly from nodes
                 Section {
-                    // Render the container body filtered to show only items in this result
-                    container.settingsBody
-                        .environment(\.searchResultIDs, matchedIDs)
+                    // Can't render from view hierarchy due to AnyView caching, use node titles
+                    ForEach(result.matchedItems) { item in
+                        if let icon = item.icon {
+                            Label(item.title, systemImage: icon)
+                        } else {
+                            Text(item.title)
+                        }
+                    }
                 } header: {
                     NavigationLink(value: result.group.asGroupConfiguration()) {
                         HStack {
@@ -168,12 +174,59 @@ struct SearchResultSection<Container: SettingsContainer>: View {
     }
 
     private var matchedIDs: Set<UUID> {
+        // Build parent map to find all ancestors
+        let allNodes = container.settingsBody.makeNodes()
+        var parentMap: [UUID: UUID] = [:]
+        buildParentMap(nodes: allNodes, parentMap: &parentMap)
+
         var ids = Set<UUID>()
-        // Only include items from this specific result
+
+        // Add the result group itself
+        ids.insert(result.group.id)
+        print("🔍 SearchResultSection: Added result group '\(result.group.title)' with ID: \(result.group.id)")
+
+        // Add all matched items
         for item in result.matchedItems {
             ids.insert(item.id)
+            print("🔍 SearchResultSection: Added matched item '\(item.title)' with ID: \(item.id)")
         }
+
+        // Add all parents of the result group up to root
+        addAllParents(of: result.group.id, parentMap: parentMap, to: &ids)
+
+        // Add all children of the result group (to show its content)
+        addAllChildren(of: result.group, to: &ids)
+
+        print("🔍 SearchResultSection: Total matched IDs: \(ids.count) - \(ids)")
         return ids
+    }
+
+    private func addAllChildren(of node: SettingsNode, to ids: inout Set<UUID>) {
+        if let children = node.children {
+            for child in children {
+                ids.insert(child.id)
+                addAllChildren(of: child, to: &ids)
+            }
+        }
+    }
+
+    private func buildParentMap(nodes: [SettingsNode], parentMap: inout [UUID: UUID], parent: UUID? = nil) {
+        for node in nodes {
+            if let parent = parent {
+                parentMap[node.id] = parent
+            }
+            if let children = node.children {
+                buildParentMap(nodes: children, parentMap: &parentMap, parent: node.id)
+            }
+        }
+    }
+
+    private func addAllParents(of id: UUID, parentMap: [UUID: UUID], to ids: inout Set<UUID>) {
+        var currentID = id
+        while let parentID = parentMap[currentID] {
+            ids.insert(parentID)
+            currentID = parentID
+        }
     }
 }
 
