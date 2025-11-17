@@ -61,7 +61,6 @@ public struct SettingsGroup<Content: SettingsContent>: SettingsContent {
         // If search filtering is active, only render if this group or its children match
         if let searchIDs = searchResultIDs {
             let shouldRender = searchIDs.contains(id) || children.contains(where: { searchIDs.contains($0.id) })
-            let _ = print("🔍 Group '\(title)' (ID: \(id)) - shouldRender: \(shouldRender), id in set: \(searchIDs.contains(id))")
             if shouldRender {
                 style.makeGroup(
                     configuration: SettingsGroupConfiguration(

@@ -42,7 +42,6 @@ public struct SettingsItem<Content: View>: SettingsContent {
         // If search filtering is active, only render if this item matches
         if let searchIDs = searchResultIDs {
             let shouldRender = searchIDs.contains(id)
-            let _ = print("🔍 Item '\(title)' (ID: \(id)) - shouldRender: \(shouldRender)")
             if shouldRender {
                 StyledSettingsItem(
                     title: title,

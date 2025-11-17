@@ -61,9 +61,8 @@ struct SearchResultsView<Container: SettingsContainer>: View {
     @Environment(\.settingsStyle) private var style
 
     var body: some View {
-        let _ = print("🔍 SearchResultsView: rendering with \(matchedIDs.count) matched IDs: \(matchedIDs)")
         // Render the full container body with search filtering applied via environment
-        return container.settingsBody
+        container.settingsBody
             .environment(\.searchResultIDs, matchedIDs)
     }
 
@@ -188,12 +187,10 @@ struct SearchResultSection<Container: SettingsContainer>: View {
 
         // Add the result group itself
         ids.insert(result.group.id)
-        print("🔍 SearchResultSection: Added result group '\(result.group.title)' with ID: \(result.group.id)")
 
         // Add all matched items
         for item in result.matchedItems {
             ids.insert(item.id)
-            print("🔍 SearchResultSection: Added matched item '\(item.title)' with ID: \(item.id)")
         }
 
         // Add all parents of the result group up to root
@@ -202,7 +199,6 @@ struct SearchResultSection<Container: SettingsContainer>: View {
         // Add all children of the result group (to show its content)
         addAllChildren(of: result.group, to: &ids)
 
-        print("🔍 SearchResultSection: Total matched IDs: \(ids.count) - \(ids)")
         return ids
     }
 
