@@ -55,13 +55,17 @@ private struct SidebarContainer: View {
                         selectedGroup.content
                     }
                     .navigationTitle(selectedGroup.title)
+                    #if !os(tvOS)
                     .navigationBarTitleDisplayMode(.inline)
+                    #endif
                     .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
                         List {
                             groupConfig.content
                         }
                         .navigationTitle(groupConfig.title)
+                        #if !os(tvOS)
                         .navigationBarTitleDisplayMode(.inline)
+                        #endif
                     }
                 }
             } else {

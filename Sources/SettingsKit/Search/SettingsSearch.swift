@@ -39,7 +39,7 @@ public struct SettingsSearchResult: Identifiable {
 
 /// Environment key for settings search.
 struct SettingsSearchKey: EnvironmentKey {
-    static let defaultValue: AnySettingsSearch = AnySettingsSearch(DefaultSettingsSearch())
+    nonisolated(unsafe) static let defaultValue: AnySettingsSearch = AnySettingsSearch(DefaultSettingsSearch())
 }
 
 extension EnvironmentValues {

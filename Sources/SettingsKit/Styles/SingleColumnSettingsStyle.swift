@@ -18,7 +18,9 @@ public struct SingleColumnSettingsStyle: SettingsStyle {
                         configuration.content
                     }
                     .navigationTitle(configuration.title)
+                    #if !os(tvOS)
                     .navigationBarTitleDisplayMode(.inline)
+                    #endif
                 }
             }
             .navigationDestination(for: SettingsGroupConfiguration.self) { groupConfig in
@@ -26,7 +28,9 @@ public struct SingleColumnSettingsStyle: SettingsStyle {
                     groupConfig.content
                 }
                 .navigationTitle(groupConfig.title)
+                #if !os(tvOS)
                 .navigationBarTitleDisplayMode(.inline)
+                #endif
             }
         }
     }
